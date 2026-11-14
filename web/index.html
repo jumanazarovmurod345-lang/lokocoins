@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="ru" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>LOGO COINS — Dark Edition</title>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <style>
+    body {
+      background-color: #080c14;
+      color: #f1f5f9;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    /* Neon glow effects */
+    .glow-blue { box-shadow: 0 0 25px rgba(59, 130, 246, 0.4); }
+    .glow-gold { box-shadow: 0 0 25px rgba(245, 158, 11, 0.4); }
+    .glow-emerald { box-shadow: 0 0 25px rgba(16, 185, 129, 0.4); }
+
+    /* Roulette animation container */
+    .roulette-strip {
+      display: flex;
+      transition: transform 4.5s cubic-bezier(0.12, 0.8, 0.2, 1);
+    }
+
+    /* Rocket trajectory canvas styling */
+    .rocket-canvas {
+      background: radial-gradient(circle at bottom, #111e38 0%, #080c14 70%);
+    }
+
+    /* Custom scrollbar */
+    ::-webkit-scrollbar { width: 4px; height: 4px; }
+    ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+  </style>
+</head>
+<body class="p-3 sm:p-5 flex justify-center items-center min-h-screen">
+
+  <!-- Mobile Frame in Deep Dark Theme -->
+  <div class="w-full max-w-sm bg-[#0d1322] border border-[#1e293b] rounded-3xl shadow-2xl overflow-hidden flex flex-col min-h-[720px] relative">
+
+    <!-- Top Header: Balances (LOGO & Stars ⭐) + Deposit Button -->
+    <div class="px-4 py-3 bg-[#0f172a] border-b border-[#1e293b] flex items-center justify-between z-20">
+      <div class="flex items-center gap-2">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 text-white font-black flex items-center justify-center text-xs shadow-md glow-blue">
+          LOGO
+        </div>
+        <div>
+          <div class="font-extrabold text-sm tracking-tight text-white flex items-center gap-1">
+            LOGO COINS
+            <span class="text-[10px] bg-blue-500/20 text-blue-400 px-1.5 py-0.2 rounded font-semibold border border-blue-500/30">PRO</span>
+          </div>
+          <div class="text-[10px] text-slate-400">Telegram Gaming Mini App</div>
+        </div>
+      </div>
+
+      <!-- Balances Bar -->
+      <div class="flex items-center gap-1.5">
+        <div class="flex items-center gap-1 px-2.5 py-1 rounded-xl bg-[#1e293b] border border-[#334155] text-xs font-bold text-blue-400">
+          <span>🪙</span>
+          <span id="topBalance">1,000</span>
+        </div>
+        <div class="flex items-center gap-1 px-2.5 py-1 rounded-xl bg-amber-500/10 border border-amber-500/30 text-xs font-bold text-amber-400">
+          <span>⭐</span>
+          <span id="topStars">15</span>
+        </div>
+        <!-- Quick Deposit Plus Button -->
+        <button onclick="openDepositModal()" class="w-7 h-7 rounded-xl bg-blue-600 hover:bg-blue-500 text-white flex items-center justify-center text-sm font-black transition">
+          +
+        </button>
+      </div>
+    </div>
+
+    <!-- Main Dynamic Screen Content -->
+    <div id="contentArea" class="flex-1 p-3.5 overflow-y-auto space-y-4">
+
+      <!-- ================= 1. TAB: GAMES (MAIN FOCUS) ================= -->
+      <div id="tab-games" class="space-y-4">
+        
+        <!-- Game Selector Pills -->
+        <div class="grid grid-cols-3 bg-[#080c14] p-1 rounded-2xl border border-[#1e293b] text-xs font-bold">
+          <button id="pill-chop" onclick="selectGame('chop')" class="py-2 rounded-xl bg-blue-600 text-white shadow-sm flex items-center justify-center gap-1 transition">
+            🪓 Дровосек
+          </button>
+          <button id="pill-upgrade" onclick="selectGame('upgrade')" class="py-2 rounded-xl text-slate-400 hover:text-white flex items-center justify-center gap-1 transition">
+            ⚡ Апгрейдер
+          </button>
+          <button id="pill-rocket" onclick="selectGame('rocket')" class="py-2 rounded-xl text-slate-400 hover:text-white flex items-center justify-center gap-1 transition">
+            🚀 Ракета
+          </button>
+        </div>
+
+        <!-- SUB-GAME A: CHOP MASTER (REBUILT WITH COMBO & DYNAMICS) -->
+        <div id="game-view-chop" class="space-y-3">
+          <div class="bg-[#111827] border border-[#1f2937] rounded-2xl p-4 text-center relative overflow-hidden">
+            <div class="flex justify-between items-center text-xs text-slate-400 mb-2">
+              <span class="font-bold text-blue-400">Уровень <span id="chopLevel">1</span>/6</span>
+              <span class="font-bold text-amber-400">Комбо: x<span id="chopCombo">1</span></span>
+              <span class="bg-blue-500/10 text-blue-300 px-2 py-0.5 rounded font-mono">+<span id="chopReward">15</span> LOGO</span>
+            </div>
+
+            <!-- Health Bar of the Tree -->
+            <div class="w-full bg-[#1e293b] h-2 rounded-full overflow-hidden mb-3">
+              <div id="treeHpBar" class="h-full bg-gradient-to-r from-emerald-500 to-green-400 transition-all duration-150" style="width: 100%;"></div>
+            </div>
+
+            <!-- Visual Arena: Tree & Axe with Hit Zones -->
+            <div class="relative w-44 h-44 mx-auto flex items-center justify-center my-2">
+              <!-- Radial Meter Ring -->
+              <div class="absolute inset-0 rounded-full border-4 border-[#1e293b] flex items-center justify-center">
+                <!-- Top Precision Zone -->
+                <div class="absolute top-0 w-12 h-6 bg-emerald-500/80 rounded-b-xl shadow-lg shadow-emerald-500/30"></div>
+              </div>
+
+              <!-- Rotating Needle -->
+              <div id="chopNeedle" class="absolute inset-0 flex items-center justify-center" style="transform: rotate(0deg);">
+                <div class="w-1.5 h-20 bg-gradient-to-t from-transparent via-blue-500 to-blue-400 rounded-full -translate-y-10 shadow-md"></div>
+                <div class="w-3.5 h-3.5 bg-blue-500 rounded-full border-2 border-white"></div>
+              </div>
+
+              <!-- Animated Giant Tree -->
+              <div id="giantTree" class="relative z-10 text-6xl drop-shadow-2xl transition-transform select-none">
+                🌲
+              </div>
+
+              <!-- Floating Chop Sparks -->
+              <div id="chopSparks" class="absolute z-20 text-xl font-black hidden"></div>
+            </div>
+
+            <div id="chopStatus" class="h-5 text-xs font-bold text-slate-300">
+              Поймай стрелку в зелёной зоне вверху!
+            </div>
+
+            <button id="hitChopBtn" onclick="chopClick()" class="w-full mt-3 py-3.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-black text-sm uppercase rounded-2xl tracking-wider shadow-lg glow-blue active:scale-95 transition">
+              🪓 МОЩНЫЙ УДАР!
+            </button>
+          </div>
+        </div>
+
+        <!-- SUB-GAME B: UPGRADER (STAKE LOGO/STARS/ITEMS FOR UPGRADE) -->
+        <div id="game-view-upgrade" class="hidden space-y-3">
+          <div class="bg-[#111827] border border-[#1f2937] rounded-2xl p-4 text-center">
+            <h3 class="font-extrabold text-sm text-white mb-1">⚡ Колесо Апгрейда</h3>
+            <p class="text-xs text-slate-400 mb-3">Ставь монеты, звезды или подарки и умножай их!</p>
+
+            <!-- Circular Upgrader Wheel with Dynamic Success Slice -->
+            <div class="relative w-40 h-40 mx-auto my-2 flex items-center justify-center">
+              <svg id="wheelSvg" class="w-full h-full -rotate-90" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="40" fill="transparent" stroke="#1e293b" stroke-width="12" />
+                <circle id="wheelSuccessArc" cx="50" cy="50" r="40" fill="transparent" stroke="#10b981" stroke-width="12" stroke-dasharray="80 251.2" stroke-dashoffset="0" />
+              </svg>
+
+              <!-- Center Multiplier Display -->
+              <div class="absolute flex flex-col items-center">
+                <span id="upgradeChanceLabel" class="text-xl font-black text-emerald-400">45%</span>
+                <span class="text-[10px] text-slate-400 font-semibold">ШАНС</span>
+              </div>
+
+              <!-- Spinning Wheel Needle -->
+              <div id="upgraderPointer" class="absolute inset-0 flex items-center justify-center transition-transform" style="transform: rotate(0deg);">
+                <div class="w-2 h-18 bg-amber-400 rounded-full -translate-y-9 shadow-lg"></div>
+                <div class="w-4 h-4 bg-white rounded-full border-2 border-amber-500"></div>
+              </div>
+            </div>
+
+            <!-- Target Multiplier Buttons -->
+            <div class="grid grid-cols-4 gap-1.5 my-3 text-xs font-bold">
+              <button onclick="setUpgraderMultiplier(1.5, 60)" class="py-1.5 rounded-lg bg-[#1e293b] hover:bg-blue-600 text-slate-200 focus:bg-blue-600">x1.5</button>
+              <button onclick="setUpgraderMultiplier(2.0, 45)" class="py-1.5 rounded-lg bg-blue-600 text-white font-bold">x2.0</button>
+              <button onclick="setUpgraderMultiplier(5.0, 18)" class="py-1.5 rounded-lg bg-[#1e293b] hover:bg-blue-600 text-slate-200">x5.0</button>
+              <button onclick="setUpgraderMultiplier(10.0, 9)" class="py-1.5 rounded-lg bg-[#1e293b] hover:bg-blue-600 text-slate-200">x10</button>
+            </div>
+
+            <!-- Stake Source Selection (LOGO, Stars, Item) -->
+            <div class="bg-[#080c14] p-2.5 rounded-xl border border-[#1e293b] text-left space-y-2">
+              <div class="text-[11px] font-bold text-slate-400 uppercase">Что ставим:</div>
+              <div class="grid grid-cols-3 gap-1.5 text-xs font-semibold">
+                <button id="stakeTypeLogo" onclick="setStakeType('logo')" class="p-1.5 rounded-lg bg-blue-600 text-white text-center border border-blue-500">
+                  🪙 200 LOGO
+                </button>
+                <button id="stakeTypeStars" onclick="setStakeType('stars')" class="p-1.5 rounded-lg bg-[#1e293b] text-slate-300 text-center border border-[#334155]">
+                  ⭐ 5 Звёзд
+                </button>
+                <button id="stakeTypeItem" onclick="setStakeType('item')" class="p-1.5 rounded-lg bg-[#1e293b] text-slate-300 text-center border border-[#334155]">
+                  🧸 Медведь
+                </button>
+              </div>
+              <div class="text-[11px] text-slate-400 flex justify-between pt-1">
+                <span>Возможный выигрыш:</span>
+                <span id="potentialWinLabel" class="font-bold text-emerald-400">400 LOGO</span>
+              </div>
+            </div>
+
+            <button id="spinUpgraderBtn" onclick="runUpgrader()" class="w-full mt-3 py-3 bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-white font-black text-xs uppercase tracking-wider rounded-xl shadow-lg glow-emerald active:scale-95 transition">
+              СДЕЛАТЬ АПГРЕЙД!
+            </button>
+          </div>
+        </div>
+
+        <!-- SUB-GAME C: CRASH ROCKET (РАКЕТА) -->
+        <div id="game-view-rocket" class="hidden space-y-3">
+          <div class="bg-[#111827] border border-[#1f2937] rounded-2xl p-4 text-center relative overflow-hidden">
+            
+            <!-- Rocket Flight Display Area -->
+            <div class="h-44 w-full rounded-2xl rocket-canvas border border-[#1e293b] relative flex flex-col items-center justify-center overflow-hidden">
+              <!-- Stars background particles -->
+              <div class="absolute inset-0 opacity-40 text-xs">
+                <span class="absolute top-2 left-6">✨</span>
+                <span class="absolute top-10 right-8">⭐</span>
+                <span class="absolute bottom-6 left-12">✨</span>
+              </div>
+
+              <!-- Flying Rocket SVG/Emoji -->
+              <div id="rocketObj" class="text-5xl transition-all duration-75 relative z-10" style="transform: translateY(0px) scale(1);">
+                🚀
+              </div>
+
+              <!-- Giant Multiplier Number -->
+              <div id="rocketMult" class="text-3xl font-black text-amber-400 tracking-tight mt-2 drop-shadow-md">
+                1.00x
+              </div>
+
+              <div id="rocketCrashedText" class="text-rose-500 font-black text-sm uppercase hidden tracking-wider">
+                💥 ВЗРЫВ! РАКЕТА УЛЕТЕЛА
+              </div>
+            </div>
+
+            <!-- Bet Selector -->
+            <div class="flex items-center justify-between my-3 bg-[#080c14] p-2.5 rounded-xl border border-[#1e293b] text-xs">
+              <span class="text-slate-400 font-bold">Ставка:</span>
+              <div class="flex gap-1.5 font-bold">
+                <button onclick="setRocketBet(50)" class="px-2.5 py-1 rounded bg-[#1e293b] text-blue-400 hover:bg-blue-600 hover:text-white">50</button>
+                <button onclick="setRocketBet(100)" class="px-2.5 py-1 rounded bg-blue-600 text-white">100</button>
+                <button onclick="setRocketBet(250)" class="px-2.5 py-1 rounded bg-[#1e293b] text-blue-400 hover:bg-blue-600 hover:text-white">250</button>
+                <button onclick="setRocketBet(500)" class="px-2.5 py-1 rounded bg-[#1e293b] text-blue-400 hover:bg-blue-600 hover:text-white">500</button>
+              </div>
+            </div>
+
+            <!-- Start / Cashout Buttons -->
+            <div class="flex gap-2">
+              <button id="rocketLaunchBtn" onclick="launchRocket()" class="flex-1 py-3 bg-blue-600 hover:bg-blue-500 text-white font-extrabold text-xs uppercase tracking-wider rounded-xl shadow-md glow-blue active:scale-95 transition">
+                ЗАПУСТИТЬ РАКЕТУ
+              </button>
+              <button id="rocketCashoutBtn" onclick="cashoutRocket()" disabled class="flex-1 py-3 bg-emerald-600 text-white font-extrabold text-xs uppercase tracking-wider rounded-xl opacity-40 cursor-not-allowed shadow-md glow-emerald active:scale-95 transition">
+                ЗАБРАТЬ (<span id="cashoutAmount">0</span>)
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ================= 2. TAB: CASES (ROULETTE & TELEGRAM STARS) ================= -->
+      <div id="tab-cases" class="hidden space-y-4">
+        
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-base font-extrabold text-white">Кейсы со звёздами</h2>
+            <p class="text-xs text-slate-400">Крути рулетку и выигрывай коллекционные подарки!</p>
+          </div>
+          <span class="text-xs font-bold text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-full">
+            Telegram Stars ⭐
+          </span>
+        </div>
+
+        <!-- Equivalence Reminder Banner -->
+        <div class="bg-gradient-to-r from-blue-950/60 to-indigo-950/60 border border-blue-500/30 rounded-2xl p-3 flex items-center justify-between text-xs">
+          <div class="flex items-center gap-2">
+            <span class="text-2xl">🧸</span>
+            <div>
+              <div class="font-bold text-slate-200">Медвежонок = 15 ⭐ (1,000 LOGO)</div>
+              <div class="text-[11px] text-slate-400">Ликвидный подарок с обменом</div>
+            </div>
+          </div>
+          <button onclick="openDepositModal()" class="px-2.5 py-1 bg-amber-500 text-slate-950 font-extrabold rounded-lg text-[11px]">
+            Купить ⭐
+          </button>
+        </div>
+
+        <!-- Cases Showcase Grid -->
+        <div class="space-y-3">
+          
+          <!-- Stars Case 1: Bear Box (15 Stars) -->
+          <div class="bg-[#111827] border border-[#1f2937] rounded-2xl p-3.5 flex items-center justify-between shadow-sm">
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center text-3xl">
+                🧸
+              </div>
+              <div>
+                <div class="font-extrabold text-sm text-white">Кейс «Медвежонок»</div>
+                <div class="text-xs text-slate-400">Шанс: Медведь, Ракета, до 2,500 LOGO</div>
+                <div class="text-xs font-bold text-amber-400 mt-0.5">15 Telegram Stars ⭐</div>
+              </div>
+            </div>
+            <button onclick="startRouletteCase('Кейс Медвежонок', 15, 'stars')" class="px-3.5 py-2 bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-black text-xs rounded-xl shadow-md glow-gold active:scale-95 transition">
+              Открыть
+            </button>
+          </div>
+
+          <!-- Stars Case 2: Space Rocket Box (50 Stars) -->
+          <div class="bg-[#111827] border border-[#1f2937] rounded-2xl p-3.5 flex items-center justify-between shadow-sm">
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 rounded-xl bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 flex items-center justify-center text-3xl">
+                🚀
+              </div>
+              <div>
+                <div class="font-extrabold text-sm text-white">Кейс «Космос Star»</div>
+                <div class="text-xs text-slate-400">Легендарные ракеты, алмазы и LOGO</div>
+                <div class="text-xs font-bold text-amber-400 mt-0.5">50 Telegram Stars ⭐</div>
+              </div>
+            </div>
+            <button onclick="startRouletteCase('Кейс Космос Star', 50, 'stars')" class="px-3.5 py-2 bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-black text-xs rounded-xl shadow-md glow-gold active:scale-95 transition">
+              Открыть
+            </button>
+          </div>
+
+          <!-- Stars Case 3: VIP Diamond Box (100 Stars) -->
+          <div class="bg-[#111827] border border-[#1f2937] rounded-2xl p-3.5 flex items-center justify-between shadow-sm">
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 rounded-xl bg-blue-500/10 border border-blue-500/30 text-blue-400 flex items-center justify-center text-3xl">
+                💎
+              </div>
+              <div>
+                <div class="font-extrabold text-sm text-white">VIP Diamond Box</div>
+                <div class="text-xs text-slate-400">Супер-призы: 15,000 LOGO, Алмаз</div>
+                <div class="text-xs font-bold text-amber-400 mt-0.5">100 Telegram Stars ⭐</div>
+              </div>
+            </div>
+            <button onclick="startRouletteCase('VIP Diamond Box', 100, 'stars')" class="px-3.5 py-2 bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-black text-xs rounded-xl shadow-md glow-gold active:scale-95 transition">
+              Открыть
+            </button>
+          </div>
+
+          <!-- Free Daily Case -->
+          <div class="bg-[#111827] border border-[#1f2937] rounded-2xl p-3.5 flex items-center justify-between shadow-sm">
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center text-3xl">
+                🎁
+              </div>
+              <div>
+                <div class="font-extrabold text-sm text-white">Ежедневный Бесплатный</div>
+                <div class="text-xs text-slate-400">Каждые 24 часа для всех игроков</div>
+                <div class="text-xs font-bold text-emerald-400 mt-0.5">Бесплатно</div>
+              </div>
+            </div>
+            <button onclick="startRouletteCase('Бесплатный кейс', 0, 'free')" class="px-3.5 py-2 bg-emerald-600 text-white font-black text-xs rounded-xl shadow-md glow-emerald active:scale-95 transition">
+              Крутить
+            </button>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- ================= 3. TAB: LEADERBOARD (WEALTH & ONLINE TIME) ================= -->
+      <div id="tab-leaderboard" class="hidden space-y-3">
+        <h2 class="text-base font-extrabold text-white">Зал Славы</h2>
+
+        <!-- Leaderboard Selector -->
+        <div class="grid grid-cols-2 bg-[#080c14] p-1 rounded-2xl border border-[#1e293b] text-xs font-bold">
+          <button id="lbBtnWealth" onclick="selectLeaderboard('wealth')" class="py-2 rounded-xl bg-blue-600 text-white shadow-sm">
+            💰 Самые богатые
+          </button>
+          <button id="lbBtnTime" onclick="selectLeaderboard('time')" class="py-2 rounded-xl text-slate-400 hover:text-white">
+            ⏳ Время в боте
+          </button>
+        </div>
+
+        <!-- Wealth List -->
+        <div id="lbListWealth" class="space-y-2">
+          <div class="p-3 rounded-2xl bg-[#111827] border border-[#1f2937] flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+              <span class="text-xl">🥇</span>
+              <div>
+                <div class="font-extrabold text-xs text-white">Pavel_Durov</div>
+                <div class="text-[10px] text-slate-400">1,500 ⭐ • 120,000 LOGO • 14 Ракет</div>
+              </div>
+            </div>
+            <div class="text-right">
+              <div class="font-black text-xs text-amber-400">$2,450</div>
+              <div class="text-[10px] text-slate-400">Net Worth</div>
+            </div>
+          </div>
+
+          <div class="p-3 rounded-2xl bg-[#111827] border border-[#1f2937] flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+              <span class="text-xl">🥈</span>
+              <div>
+                <div class="font-extrabold text-xs text-white">Whale_Trader</div>
+                <div class="text-[10px] text-slate-400">850 ⭐ • 84,000 LOGO</div>
+              </div>
+            </div>
+            <div class="text-right">
+              <div class="font-black text-xs text-amber-400">$1,380</div>
+              <div class="text-[10px] text-slate-400">Net Worth</div>
+            </div>
+          </div>
+
+          <div class="p-3 rounded-2xl bg-[#111827] border border-[#1f2937] flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+              <span class="text-xl">🥉</span>
+              <div>
+                <div class="font-extrabold text-xs text-white">Alex_Logo (Вы)</div>
+                <div class="text-[10px] text-blue-400 font-semibold">Ваш текущий баланс</div>
+              </div>
+            </div>
+            <div class="text-right">
+              <div id="myNetWorth" class="font-black text-xs text-amber-400">$25.00</div>
+              <div class="text-[10px] text-slate-400">Net Worth</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Online Time List -->
+        <div id="lbListTime" class="hidden space-y-2">
+          <div class="p-3 rounded-2xl bg-[#111827] border border-[#1f2937] flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+              <span class="text-xl">🥇</span>
+              <div>
+                <div class="font-extrabold text-xs text-white">ChopMaster_Pro</div>
+                <div class="text-[10px] text-slate-400">Активен 34 дня подряд</div>
+              </div>
+            </div>
+            <span class="font-bold text-xs text-blue-400">182 часа</span>
+          </div>
+
+          <div class="p-3 rounded-2xl bg-[#111827] border border-[#1f2937] flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+              <span class="text-xl">🥈</span>
+              <div>
+                <div class="font-extrabold text-xs text-white">Night_Player</div>
+                <div class="text-[10px] text-slate-400">Регулярные турниры</div>
+              </div>
+            </div>
+            <span class="font-bold text-xs text-blue-400">146 часов</span>
+          </div>
+
+          <div class="p-3 rounded-2xl bg-[#111827] border border-[#1f2937] flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+              <span class="text-xl">🥉</span>
+              <div>
+                <div class="font-extrabold text-xs text-white">Alex_Logo (Вы)</div>
+                <div class="text-[10px] text-blue-400 font-semibold">Ваше время в боте</div>
+              </div>
+            </div>
+            <span class="font-bold text-xs text-blue-400">18.5 часов</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ================= 4. TAB: PROFILE & INVENTORY ================= -->
+      <div id="tab-profile" class="hidden space-y-4">
+        
+        <!-- Profile Card -->
+        <div class="bg-[#111827] border border-[#1f2937] rounded-2xl p-4 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white font-extrabold text-lg flex items-center justify-center glow-blue">
+              A
+            </div>
+            <div>
+              <div class="font-extrabold text-sm text-white">Alex_Logo</div>
+              <div class="text-[11px] text-slate-400">ID: 894321098 • @alex_logo</div>
+            </div>
+          </div>
+          <button onclick="openDepositModal()" class="px-3 py-1.5 bg-blue-600 text-white font-bold text-xs rounded-xl shadow-md">
+            Пополнить
+          </button>
+        </div>
+
+        <!-- Inventory List -->
+        <div>
+          <div class="font-extrabold text-xs text-slate-400 uppercase tracking-wider mb-2 flex justify-between">
+            <span>Инвентарь трофеев</span>
+            <span class="text-blue-400">Стоимость в ⭐</span>
+          </div>
+          <div id="inventoryContainer" class="grid grid-cols-3 gap-2">
+            <div class="p-2.5 rounded-xl border border-[#1f2937] bg-[#111827] text-center">
+              <div class="text-2xl mb-1">🧸</div>
+              <div class="text-xs font-semibold text-white">Медвежонок</div>
+              <div class="text-[10px] text-amber-400 font-bold mt-0.5">≈ 15 ⭐</div>
+            </div>
+            <div class="p-2.5 rounded-xl border border-[#1f2937] bg-[#111827] text-center">
+              <div class="text-2xl mb-1">🚀</div>
+              <div class="text-xs font-semibold text-white">Ракета</div>
+              <div class="text-[10px] text-amber-400 font-bold mt-0.5">≈ 50 ⭐</div>
+            </div>
+            <div class="p-2.5 rounded-xl border border-[#1f2937] bg-[#111827] text-center">
+              <div class="text-2xl mb-1">💎</div>
+              <div class="text-xs font-semibold text-white">Алмаз</div>
+              <div class="text-[10px] text-amber-400 font-bold mt-0.5">≈ 100 ⭐</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Referral Link Share -->
+        <div class="bg-[#111827] border border-[#1f2937] rounded-2xl p-3.5 space-y-2">
+          <div class="text-xs font-extrabold text-white">Реферальная ссылка (+10 LOGO за друга)</div>
+          <div class="text-xs font-mono text-slate-400 bg-[#080c14] p-2 rounded-xl truncate border border-[#1e293b]">
+            https://t.me/logocoins_bot?start=ref_ALEX2026
+          </div>
+          <button onclick="navigator.clipboard.writeText('https://t.me/logocoins_bot?start=ref_ALEX2026'); alert('Ссылка скопирована!');" class="w-full py-2 bg-blue-600 text-white font-bold text-xs rounded-xl shadow">
+            Копировать ссылку
+          </button>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Bottom Navigation Bar -->
+    <div class="bg-[#0f172a] border-t border-[#1e293b] p-2 grid grid-cols-4 text-center text-xs font-semibold z-20">
+      <button onclick="switchTab('games')" id="nav-games" class="py-1 text-blue-500 flex flex-col items-center">
+        <span class="text-lg">🎮</span>
+        <span class="text-[11px]">Игры</span>
+      </button>
+      <button onclick="switchTab('cases')" id="nav-cases" class="py-1 text-slate-400 flex flex-col items-center">
+        <span class="text-lg">🎁</span>
+        <span class="text-[11px]">Кейсы ⭐</span>
+      </button>
+      <button onclick="switchTab('leaderboard')" id="nav-leaderboard" class="py-1 text-slate-400 flex flex-col items-center">
+        <span class="text-lg">🏆</span>
+        <span class="text-[11px]">Рейтинг</span>
+      </button>
+      <button onclick="switchTab('profile')" id="nav-profile" class="py-1 text-slate-400 flex flex-col items-center">
+        <span class="text-lg">👤</span>
+        <span class="text-[11px]">Профиль</span>
+      </button>
+    </div>
+
+  </div>
+
+  <!-- ================= MODAL: ROULETTE CASE OPENING ================= -->
+  <div id="rouletteModal" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-4 z-50">
+    <div class="bg-[#0f172a] border border-[#1e293b] rounded-3xl p-5 text-center max-w-sm w-full shadow-2xl relative overflow-hidden">
+      
+      <h3 id="rouletteCaseName" class="text-base font-extrabold text-white mb-1">Открытие кейса</h3>
+      <p class="text-xs text-slate-400 mb-4">Рулетка крутится...</p>
+
+      <!-- Roulette Horizontal Strip Viewport -->
+      <div class="relative w-full h-28 bg-[#080c14] rounded-2xl border-2 border-blue-500/40 overflow-hidden flex items-center my-2">
+        <!-- Center Target Pointer -->
+        <div class="absolute left-1/2 -translate-x-1/2 top-0 bottom-0 w-1 bg-amber-400 z-20 shadow-lg glow-gold"></div>
+        <div class="absolute left-1/2 -translate-x-1/2 -top-1 w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[8px] border-t-amber-400 z-20"></div>
+
+        <!-- Scrolling Items Track -->
+        <div id="rouletteTrack" class="roulette-strip items-center gap-2 pl-36">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- Winning Result Banner -->
+      <div id="roulettePrizeBanner" class="my-4 hidden">
+        <div class="text-[11px] text-slate-400 uppercase font-semibold">Ваш выигрыш:</div>
+        <div id="roulettePrizeText" class="text-2xl font-black text-amber-400 mt-1 animate-bounce">
+          🧸 Медвежонок
+        </div>
+      </div>
+
+      <button id="claimRouletteBtn" onclick="closeRouletteModal()" disabled class="w-full py-3 bg-blue-600 text-white font-extrabold rounded-xl text-xs uppercase opacity-40 cursor-not-allowed transition">
+        Забрать награду
+      </button>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: DEPOSIT (STARS & MONEY/RUB) ================= -->
+  <div id="depositModal" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-4 z-50">
+    <div class="bg-[#0f172a] border border-[#1e293b] rounded-3xl p-5 max-w-sm w-full shadow-2xl space-y-4">
+      
+      <div class="flex justify-between items-center">
+        <div>
+          <h3 class="text-base font-extrabold text-white">Пополнение баланса</h3>
+          <p class="text-xs text-slate-400">Telegram Stars ⭐ или Фиатные деньги (₽ / $)</p>
+        </div>
+        <button onclick="closeDepositModal()" class="w-8 h-8 rounded-full bg-[#1e293b] text-slate-300 font-bold flex items-center justify-center">
+          ✕
+        </button>
+      </div>
+
+      <!-- Telegram Stars Packs -->
+      <div class="space-y-2">
+        <div class="text-xs font-extrabold text-amber-400 flex items-center gap-1">
+          <span>⭐</span> Telegram Stars
+        </div>
+        <div class="grid grid-cols-3 gap-2">
+          <button onclick="buyStars(15, 1000)" class="p-2.5 rounded-xl bg-[#111827] border border-[#1f2937] hover:border-amber-400/50 text-center transition">
+            <div class="text-sm font-black text-amber-400">15 ⭐</div>
+            <div class="text-[10px] text-slate-400">+1,000 LOGO</div>
+          </button>
+          <button onclick="buyStars(50, 3500)" class="p-2.5 rounded-xl bg-[#111827] border border-[#1f2937] hover:border-amber-400/50 text-center transition">
+            <div class="text-sm font-black text-amber-400">50 ⭐</div>
+            <div class="text-[10px] text-slate-400">+3,500 LOGO</div>
+          </button>
+          <button onclick="buyStars(100, 7500)" class="p-2.5 rounded-xl bg-[#111827] border border-[#1f2937] hover:border-amber-400/50 text-center transition">
+            <div class="text-sm font-black text-amber-400">100 ⭐</div>
+            <div class="text-[10px] text-slate-400">+7,500 LOGO</div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Money / Bank Card / Payme / Crypto -->
+      <div class="space-y-2 pt-2 border-t border-[#1e293b]">
+        <div class="text-xs font-extrabold text-blue-400 flex items-center gap-1">
+          <span>💳</span> Банковские карты и Платежи
+        </div>
+        <div class="space-y-1.5 text-xs">
+          <button onclick="depositMoney('СБП / Карта МИР', 500)" class="w-full p-2.5 rounded-xl bg-[#111827] border border-[#1f2937] flex items-center justify-between hover:bg-[#1a2336] transition">
+            <div class="flex items-center gap-2">
+              <span>🇷🇺</span>
+              <span class="font-bold text-white">СБП / МИР / Visa / MasterCard</span>
+            </div>
+            <span class="text-emerald-400 font-extrabold">500 ₽</span>
+          </button>
+          <button onclick="depositMoney('Payme / Click', 60000)" class="w-full p-2.5 rounded-xl bg-[#111827] border border-[#1f2937] flex items-center justify-between hover:bg-[#1a2336] transition">
+            <div class="flex items-center gap-2">
+              <span>🇺🇿</span>
+              <span class="font-bold text-white">Payme / Click / Humo</span>
+            </div>
+            <span class="text-emerald-400 font-extrabold">60,000 UZS</span>
+          </button>
+          <button onclick="depositMoney('TON / USDT Crypto', 10)" class="w-full p-2.5 rounded-xl bg-[#111827] border border-[#1f2937] flex items-center justify-between hover:bg-[#1a2336] transition">
+            <div class="flex items-center gap-2">
+              <span>💎</span>
+              <span class="font-bold text-white">TON / USDT Crypto Pay</span>
+            </div>
+            <span class="text-emerald-400 font-extrabold">10 USDT</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Audio Synthesizer via Web Audio API -->
+  <script>
+    class WebAudioFX {
+      constructor() {
+        this.ctx = null;
+      }
+      init() {
+        if (!this.ctx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          this.ctx = new AudioContext();
+        }
+        if (this.ctx.state === 'suspended') this.ctx.resume();
+      }
+      tick() {
+        this.init();
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.frequency.setValueAtTime(600, this.ctx.currentTime);
+        gain.gain.setValueAtTime(0.08, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.05);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.05);
+      }
+      win() {
+        this.init();
+        [440, 554, 659, 880].forEach((f, i) => {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.frequency.setValueAtTime(f, this.ctx.currentTime + i * 0.1);
+          gain.gain.setValueAtTime(0.2, this.ctx.currentTime + i * 0.1);
+          gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + (i + 1) * 0.1);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(this.ctx.currentTime + i * 0.1);
+          osc.stop(this.ctx.currentTime + (i + 1) * 0.1);
+        });
+      }
+      boom() {
+        this.init();
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(150, this.ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(30, this.ctx.currentTime + 0.3);
+        gain.gain.setValueAtTime(0.4, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.3);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.3);
+      }
+    }
+    const sound = new WebAudioFX();
+
+    // App State
+    let balance = 1000;
+    let stars = 15;
+    let chopAngle = 0;
+    let chopInterval = null;
+    let chopHp = 100;
+    let chopLvl = 1;
+    let combo = 1;
+
+    // Upgrader State
+    let upgraderMultiplier = 2.0;
+    let upgraderChance = 45;
+    let stakeType = 'logo'; // 'logo', 'stars', 'item'
+    let stakeCost = 200;
+
+    // Rocket State
+    let rocketInterval = null;
+    let rocketMultiplier = 1.0;
+    let rocketBet = 100;
+    let rocketActive = false;
+    let crashPoint = 2.5;
+
+    function updateTopUI() {
+      document.getElementById('topBalance').innerText = balance.toLocaleString();
+      document.getElementById('topStars').innerText = stars;
+      const net = (balance * 0.01 + stars * 1.5).toFixed(2);
+      const myNw = document.getElementById('myNetWorth');
+      if (myNw) myNw.innerText = `$${net}`;
+    }
+
+    // Tab Switching
+    function switchTab(tabId) {
+      ['games', 'cases', 'leaderboard', 'profile'].forEach(t => {
+        document.getElementById('tab-' + t).classList.add('hidden');
+        document.getElementById('nav-' + t).classList.remove('text-blue-500');
+        document.getElementById('nav-' + t).classList.add('text-slate-400');
+      });
+      document.getElementById('tab-' + tabId).classList.remove('hidden');
+      document.getElementById('nav-' + tabId).classList.add('text-blue-500');
+      document.getElementById('nav-' + tabId).classList.remove('text-slate-400');
+    }
+
+    // Sub-Games Navigation
+    function selectGame(gameId) {
+      ['chop', 'upgrade', 'rocket'].forEach(g => {
+        document.getElementById('game-view-' + g).classList.add('hidden');
+        document.getElementById('pill-' + g).classList.remove('bg-blue-600', 'text-white');
+        document.getElementById('pill-' + g).classList.add('text-slate-400');
+      });
+      document.getElementById('game-view-' + gameId).classList.remove('hidden');
+      document.getElementById('pill-' + gameId).classList.add('bg-blue-600', 'text-white');
+      document.getElementById('pill-' + gameId).classList.remove('text-slate-400');
+
+      if (gameId === 'chop') startChopLoop();
+      else stopChopLoop();
+    }
+
+    // ================= 1. CHOP MASTER LOGIC =================
+    function startChopLoop() {
+      if (chopInterval) clearInterval(chopInterval);
+      chopInterval = setInterval(() => {
+        chopAngle = (chopAngle + 9 + chopLvl * 2) % 360;
+        const needle = document.getElementById('chopNeedle');
+        if (needle) needle.style.transform = `rotate(${chopAngle}deg)`;
+      }, 30);
+    }
+    function stopChopLoop() {
+      if (chopInterval) clearInterval(chopInterval);
+      chopInterval = null;
+    }
+
+    function chopClick() {
+      sound.tick();
+      const tree = document.getElementById('giantTree');
+      const status = document.getElementById('chopStatus');
+      tree.style.transform = 'scale(0.8) rotate(-15deg)';
+      setTimeout(() => { tree.style.transform = 'scale(1) rotate(0deg)'; }, 140);
+
+      // Precision check near 0/360 degrees
+      const diff = Math.min(chopAngle, 360 - chopAngle);
+      if (diff <= 26) {
+        sound.win();
+        combo++;
+        chopHp -= 35;
+        const reward = (15 * chopLvl * combo);
+        balance += reward;
+        updateTopUI();
+        document.getElementById('chopCombo').innerText = combo;
+
+        if (chopHp <= 0) {
+          chopLvl = Math.min(6, chopLvl + 1);
+          chopHp = 100;
+          document.getElementById('chopLevel').innerText = chopLvl;
+          document.getElementById('chopReward').innerText = 15 * chopLvl;
+          status.innerHTML = `<span class="text-amber-400 font-extrabold">ДЕРЕВО СРУБЛЕНО! УРОВЕНЬ ${chopLvl}!</span>`;
+        } else {
+          status.innerHTML = `<span class="text-emerald-400 font-black">ТОЧНО! +${reward} LOGO (x${combo})</span>`;
+        }
+      } else {
+        combo = 1;
+        document.getElementById('chopCombo').innerText = 1;
+        status.innerHTML = `<span class="text-rose-500 font-bold">Промах! Комбо сброшено</span>`;
+      }
+      document.getElementById('treeHpBar').style.width = chopHp + '%';
+    }
+
+    // ================= 2. UPGRADER LOGIC =================
+    function setUpgraderMultiplier(mult, chance) {
+      upgraderMultiplier = mult;
+      upgraderChance = chance;
+      document.getElementById('upgradeChanceLabel').innerText = chance + '%';
+      
+      // Update green arc dasharray on circumference (2 * pi * 40 = 251.2)
+      const dash = (chance / 100) * 251.2;
+      document.getElementById('wheelSuccessArc').setAttribute('stroke-dasharray', `${dash} 251.2`);
+      calculatePotentialWin();
+    }
+
+    function setStakeType(type) {
+      stakeType = type;
+      ['logo', 'stars', 'item'].forEach(t => {
+        const btn = document.getElementById('stakeType' + t.charAt(0).toUpperCase() + t.slice(1));
+        btn.classList.remove('bg-blue-600', 'text-white', 'border-blue-500');
+        btn.classList.add('bg-[#1e293b]', 'text-slate-300', 'border-[#334155]');
+      });
+      const activeBtn = document.getElementById('stakeType' + type.charAt(0).toUpperCase() + type.slice(1));
+      activeBtn.classList.add('bg-blue-600', 'text-white', 'border-blue-500');
+      activeBtn.classList.remove('bg-[#1e293b]', 'text-slate-300');
+      calculatePotentialWin();
+    }
+
+    function calculatePotentialWin() {
+      const winLabel = document.getElementById('potentialWinLabel');
+      if (stakeType === 'logo') {
+        winLabel.innerText = Math.round(200 * upgraderMultiplier) + ' LOGO';
+      } else if (stakeType === 'stars') {
+        winLabel.innerText = Math.round(5 * upgraderMultiplier) + ' ⭐';
+      } else {
+        winLabel.innerText = '🚀 Ракета (Апгрейд!)';
+      }
+    }
+
+    function runUpgrader() {
+      if (stakeType === 'logo' && balance < 200) { alert('Недостаточно LOGO!'); return; }
+      if (stakeType === 'stars' && stars < 5) { alert('Недостаточно звёзд ⭐!'); return; }
+
+      if (stakeType === 'logo') balance -= 200;
+      if (stakeType === 'stars') stars -= 5;
+      updateTopUI();
+
+      const spinBtn = document.getElementById('spinUpgraderBtn');
+      spinBtn.disabled = true;
+
+      // Random final angle
+      const turns = 5 * 360;
+      const rollPercent = Math.random() * 100;
+      const isSuccess = rollPercent <= upgraderChance;
+      
+      // Arc spans from 0 to upgraderChance % of 360
+      const targetDeg = isSuccess
+        ? (rollPercent / upgraderChance) * ((upgraderChance / 100) * 360)
+        : ((upgraderChance / 100) * 360) + Math.random() * (360 - (upgraderChance / 100) * 360);
+
+      const finalRotation = turns + targetDeg;
+      const pointer = document.getElementById('upgraderPointer');
+      pointer.style.transition = 'transform 3.5s cubic-bezier(0.1, 0.8, 0.2, 1)';
+      pointer.style.transform = `rotate(${finalRotation}deg)`;
+
+      let tickTimer = setInterval(() => sound.tick(), 100);
+
+      setTimeout(() => {
+        clearInterval(tickTimer);
+        spinBtn.disabled = false;
+        if (isSuccess) {
+          sound.win();
+          if (stakeType === 'logo') balance += Math.round(200 * upgraderMultiplier);
+          if (stakeType === 'stars') stars += Math.round(5 * upgraderMultiplier);
+          alert('🔥 УСПЕШНЫЙ АПГРЕЙД! Награда зачислена!');
+        } else {
+          sound.boom();
+          alert('❌ Не повезло! Предмет сгорел при апгрейде.');
+        }
+        updateTopUI();
+      }, 3600);
+    }
+
+    // ================= 3. ROCKET FLY LOGIC =================
+    function setRocketBet(amt) {
+      rocketBet = amt;
+      alert(`Ставка установлена: ${amt} LOGO`);
+    }
+
+    function launchRocket() {
+      if (balance < rocketBet) { alert('Недостаточно LOGO для ставки!'); return; }
+      balance -= rocketBet;
+      updateTopUI();
+
+      rocketActive = true;
+      rocketMultiplier = 1.0;
+      crashPoint = (1.1 + Math.random() * 4.5).toFixed(2);
+
+      document.getElementById('rocketLaunchBtn').disabled = true;
+      document.getElementById('rocketLaunchBtn').classList.add('opacity-40');
+      
+      const cashBtn = document.getElementById('rocketCashoutBtn');
+      cashBtn.disabled = false;
+      cashBtn.classList.remove('opacity-40', 'cursor-not-allowed');
+
+      document.getElementById('rocketCrashedText').classList.add('hidden');
+      const rocketObj = document.getElementById('rocketObj');
+      rocketObj.style.transform = 'translateY(0px) scale(1)';
+
+      rocketInterval = setInterval(() => {
+        rocketMultiplier += 0.04;
+        document.getElementById('rocketMult').innerText = rocketMultiplier.toFixed(2) + 'x';
+        document.getElementById('cashoutAmount').innerText = Math.round(rocketBet * rocketMultiplier) + ' LOGO';
+        
+        // Rocket flies upwards
+        const yOffset = Math.min(30, (rocketMultiplier - 1) * 15);
+        rocketObj.style.transform = `translateY(-${yOffset}px) scale(1.15)`;
+
+        if (rocketMultiplier >= crashPoint) {
+          // CRASH!
+          clearInterval(rocketInterval);
+          rocketActive = false;
+          sound.boom();
+          document.getElementById('rocketCrashedText').classList.remove('hidden');
+          cashBtn.disabled = true;
+          cashBtn.classList.add('opacity-40', 'cursor-not-allowed');
+          document.getElementById('rocketLaunchBtn').disabled = false;
+          document.getElementById('rocketLaunchBtn').classList.remove('opacity-40');
+        }
+      }, 80);
+    }
+
+    function cashoutRocket() {
+      if (!rocketActive) return;
+      clearInterval(rocketInterval);
+      rocketActive = false;
+
+      const won = Math.round(rocketBet * rocketMultiplier);
+      balance += won;
+      updateTopUI();
+      sound.win();
+
+      const cashBtn = document.getElementById('rocketCashoutBtn');
+      cashBtn.disabled = true;
+      cashBtn.classList.add('opacity-40', 'cursor-not-allowed');
+      document.getElementById('rocketLaunchBtn').disabled = false;
+      document.getElementById('rocketLaunchBtn').classList.remove('opacity-40');
+
+      alert(`🎉 ВЫ УСПЕЛИ ЗАБРАТЬ: +${won} LOGO (множитель ${rocketMultiplier.toFixed(2)}x)!`);
+    }
+
+    // ================= 4. ROULETTE CASE OPENING =================
+    const caseItemsPool = [
+      { name: '10 LOGO', icon: '🪙', color: 'border-slate-500' },
+      { name: '50 LOGO', icon: '🪙', color: 'border-blue-500' },
+      { name: '250 LOGO', icon: '🪙', color: 'border-purple-500' },
+      { name: '🧸 Медвежонок', icon: '🧸', color: 'border-amber-400' },
+      { name: '🚀 Ракета', icon: '🚀', color: 'border-rose-500' },
+      { name: '💎 Алмаз', icon: '💎', color: 'border-cyan-400' },
+      { name: '1,000 LOGO', icon: '🪙', color: 'border-yellow-400' }
+    ];
+
+    function startRouletteCase(caseName, cost, type) {
+      if (type === 'stars' && stars < cost) {
+        alert('Недостаточно Telegram Stars ⭐! Нажмите «+» вверху для пополнения.');
+        return;
+      }
+      if (type === 'stars') stars -= cost;
+      updateTopUI();
+
+      document.getElementById('rouletteCaseName').innerText = caseName;
+      const modal = document.getElementById('rouletteModal');
+      const track = document.getElementById('rouletteTrack');
+      const claimBtn = document.getElementById('claimRouletteBtn');
+      const banner = document.getElementById('roulettePrizeBanner');
+
+      banner.classList.add('hidden');
+      claimBtn.disabled = true;
+      claimBtn.classList.add('opacity-40', 'cursor-not-allowed');
+
+      // Generate 45 items in strip
+      track.innerHTML = '';
+      track.style.transition = 'none';
+      track.style.transform = 'translateX(0px)';
+
+      const sequence = [];
+      for (let i = 0; i < 45; i++) {
+        const item = caseItemsPool[Math.floor(Math.random() * caseItemsPool.length)];
+        sequence.push(item);
+        const card = document.createElement('div');
+        card.className = `w-20 h-24 rounded-xl bg-[#111827] border-2 ${item.color} flex flex-col items-center justify-center shrink-0 p-1`;
+        card.innerHTML = `<span class="text-3xl">${item.icon}</span><span class="text-[10px] font-bold text-slate-200 mt-1 line-clamp-1">${item.name}</span>`;
+        track.appendChild(card);
+      }
+
+      modal.classList.remove('hidden');
+
+      // Target item around index 36
+      const targetIndex = 36;
+      const winningItem = sequence[targetIndex];
+
+      // Item width = 80px + gap 8px = 88px
+      const targetOffset = -(targetIndex * 88 - 50);
+
+      // Play tick sound during spin
+      let ticks = 0;
+      const tickSoundInterval = setInterval(() => {
+        sound.tick();
+        ticks++;
+        if (ticks > 28) clearInterval(tickSoundInterval);
+      }, 150);
+
+      setTimeout(() => {
+        track.style.transition = 'transform 4.2s cubic-bezier(0.12, 0.8, 0.2, 1)';
+        track.style.transform = `translateX(${targetOffset}px)`;
+      }, 50);
+
+      setTimeout(() => {
+        sound.win();
+        document.getElementById('roulettePrizeText').innerText = winningItem.name;
+        banner.classList.remove('hidden');
+        claimBtn.disabled = false;
+        claimBtn.classList.remove('opacity-40', 'cursor-not-allowed');
+
+        // Award
+        if (winningItem.name.includes('LOGO')) {
+          const val = parseInt(winningItem.name.replace(/[^0-9]/g, ''));
+          balance += val;
+        } else {
+          // Add to inventory
+          const container = document.getElementById('inventoryContainer');
+          const div = document.createElement('div');
+          div.className = 'p-2.5 rounded-xl border border-[#1f2937] bg-[#111827] text-center';
+          div.innerHTML = `<div class="text-2xl mb-1">${winningItem.icon}</div><div class="text-xs font-semibold text-white">${winningItem.name}</div><div class="text-[10px] text-amber-400 font-bold mt-0.5">Новый!</div>`;
+          container.appendChild(div);
+        }
+        updateTopUI();
+      }, 4300);
+    }
+
+    function closeRouletteModal() {
+      document.getElementById('rouletteModal').classList.add('hidden');
+    }
+
+    // ================= 5. DEPOSIT MODAL =================
+    function openDepositModal() {
+      document.getElementById('depositModal').classList.remove('hidden');
+    }
+    function closeDepositModal() {
+      document.getElementById('depositModal').classList.add('hidden');
+    }
+
+    function buyStars(amtStars, logoBonus) {
+      stars += amtStars;
+      balance += logoBonus;
+      updateTopUI();
+      sound.win();
+      alert(`🎉 Успешно начислено: ${amtStars} Telegram Stars ⭐ и +${logoBonus} бонусных LOGO!`);
+      closeDepositModal();
+    }
+
+    function depositMoney(method, amount) {
+      sound.win();
+      balance += 5000;
+      stars += 25;
+      updateTopUI();
+      alert(`✅ Платёж через ${method} на сумму ${amount} подтверждён!\nНачислено: +25 ⭐ и +5,000 LOGO!`);
+      closeDepositModal();
+    }
+
+    // ================= 6. LEADERBOARDS =================
+    function selectLeaderboard(type) {
+      if (type === 'wealth') {
+        document.getElementById('lbListWealth').classList.remove('hidden');
+        document.getElementById('lbListTime').classList.add('hidden');
+        document.getElementById('lbBtnWealth').className = 'py-2 rounded-xl bg-blue-600 text-white shadow-sm';
+        document.getElementById('lbBtnTime').className = 'py-2 rounded-xl text-slate-400 hover:text-white';
+      } else {
+        document.getElementById('lbListWealth').classList.add('hidden');
+        document.getElementById('lbListTime').classList.remove('hidden');
+        document.getElementById('lbBtnTime').className = 'py-2 rounded-xl bg-blue-600 text-white shadow-sm';
+        document.getElementById('lbBtnWealth').className = 'py-2 rounded-xl text-slate-400 hover:text-white';
+      }
+    }
+
+    // Start in game mode
+    startChopLoop();
+  </script>
+</body>
+</html>
