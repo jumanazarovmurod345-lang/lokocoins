@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>LOGO COINS</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+  :root{
+    --bg:#05080f; --panel:#0b1220; --panel2:#101a2e; --line:#18263f;
+    --blue:#2f7bff; --blue2:#5aa2ff; --ice:#cfe3ff; --white:#f5f8ff; --muted:#8a9bb8;
+    --ok:#4ade80; --bad:#ff5d6c;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;background:var(--bg);color:var(--white);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    user-select:none;-webkit-user-select:none}
+  button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;padding:0}
+  button:disabled{opacity:.45;cursor:not-allowed}
+  input{font:inherit}
+  .hidden{display:none!important}
+  .ic{width:1.25em;height:1.25em;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none;vertical-align:-.22em}
+  .ic.fill{fill:currentColor;stroke:none}
+  .star{color:var(--ice)} .coin{color:var(--blue2)}
+
+  #app{max-width:480px;margin:0 auto;min-height:100dvh;position:relative;background:
+    radial-gradient(120% 60% at 50% -10%,#0d2150 0%,transparent 60%),var(--bg)}
+  header.top{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;
+    padding:12px 14px;background:rgba(5,8,15,.82);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+  .brand{display:flex;align-items:center;gap:10px}
+  .logo{width:36px;height:36px;border-radius:11px;background:linear-gradient(145deg,var(--blue),#1747b8);
+    display:flex;align-items:center;justify-content:center;font-size:20px;color:#fff;box-shadow:0 0 22px rgba(47,123,255,.45)}
+  .brand b{font-size:14px;letter-spacing:.3px;display:block}
+  .brand small{font-size:10px;color:var(--muted)}
+  .tag{font-size:9px;font-weight:800;padding:2px 6px;border-radius:6px;background:rgba(47,123,255,.18);color:var(--blue2);border:1px solid rgba(47,123,255,.4);margin-left:6px;vertical-align:1px}
+  .bal{display:flex;gap:6px;align-items:center}
+  .bpill{display:flex;align-items:center;gap:6px;padding:6px 10px;border-radius:12px;background:var(--panel2);border:1px solid var(--line);font-weight:800;font-size:13px}
+  .plus{width:32px;height:32px;border-radius:11px;background:var(--blue);display:flex;align-items:center;justify-content:center;color:#fff}
+
+  main{padding:14px 14px 110px}
+  h2{font-size:18px;margin:4px 0 2px} .sub{color:var(--muted);font-size:12px;margin:0 0 12px}
+  .card{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:18px;padding:14px}
+  .stack>*+*{margin-top:12px}
+  .row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px;border-radius:14px;font-weight:800;font-size:13px;letter-spacing:.4px;
+    background:var(--panel2);border:1px solid var(--line);transition:transform .1s}
+  .btn:active{transform:scale(.97)}
+  .btn.primary{background:linear-gradient(135deg,var(--blue),#1f5fe0);border-color:transparent;box-shadow:0 8px 26px rgba(47,123,255,.35)}
+  .btn.white{background:#fff;color:#05080f;border-color:#fff}
+  .btn.sm{width:auto;padding:8px 12px;font-size:12px;border-radius:11px}
+  .chips{display:flex;gap:8px;flex-wrap:wrap}
+  .chip{padding:9px 14px;border-radius:12px;background:var(--bg);border:1px solid var(--line);font-weight:800;font-size:13px;color:var(--muted)}
+  .chip.on{background:var(--blue);border-color:var(--blue);color:#fff}
+  .seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:4px;gap:4px}
+  .seg button{padding:9px 6px;border-radius:10px;font-size:12px;font-weight:800;color:var(--muted);display:flex;gap:6px;align-items:center;justify-content:center}
+  .seg button.on{background:var(--blue);color:#fff}
+  .label{font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin:2px 0 8px}
+  .note{font-size:11px;color:var(--muted);line-height:1.45}
+  .demo{display:flex;gap:8px;align-items:flex-start;padding:10px 12px;border-radius:12px;background:rgba(47,123,255,.1);border:1px solid rgba(47,123,255,.3);color:var(--ice);font-size:11px;line-height:1.4}
+
+  /* Game covers */
+  .cover{display:block;width:100%;border-radius:18px;overflow:hidden;border:1px solid var(--line);position:relative;text-align:left;background:var(--panel)}
+  .cover svg.art{display:block;width:100%;height:auto}
+  .cover .cap{position:absolute;left:0;right:0;bottom:0;padding:26px 14px 12px;background:linear-gradient(0deg,rgba(3,6,13,.95),transparent);
+    display:flex;align-items:flex-end;justify-content:space-between}
+  .cover .cap b{font-size:17px} .cover .cap span{font-size:11px;color:var(--ice)}
+  .cover:active{transform:scale(.985)}
+
+  /* Cases */
+  .case{padding:12px;text-align:center}
+  .case > svg{width:100%;height:auto;display:block;filter:drop-shadow(0 10px 18px rgba(47,123,255,.35))}
+  .case b{display:block;font-size:14px;margin-top:4px}
+  .case small{display:block;color:var(--muted);font-size:11px;margin:2px 0 10px}
+
+  /* Nav */
+  nav.bar{position:fixed;left:50%;transform:translateX(-50%);bottom:12px;width:min(456px,calc(100% - 24px));z-index:30;
+    display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:6px;border-radius:24px;background:rgba(8,13,24,.92);
+    backdrop-filter:blur(14px);border:1px solid var(--line)}
+  nav.bar button{display:flex;flex-direction:column;align-items:center;gap:3px;padding:9px 0;border-radius:18px;font-size:10px;font-weight:700;color:var(--muted)}
+  nav.bar button .ic{font-size:20px}
+  nav.bar button.on{background:#fff;color:#05080f}
+
+  /* Screens & modals */
+  .screen{position:fixed;inset:0;z-index:40;background:var(--bg);overflow-y:auto;max-width:480px;margin:0 auto;
+    background:radial-gradient(120% 60% at 50% -10%,#0d2150 0%,transparent 60%),var(--bg)}
+  .screen .head{position:sticky;top:0;z-index:2;display:flex;align-items:center;gap:10px;padding:12px 14px;background:rgba(5,8,15,.85);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+  .screen .head h3{margin:0;font-size:16px;flex:1}
+  .iconbtn{width:36px;height:36px;border-radius:12px;background:var(--panel2);border:1px solid var(--line);display:flex;align-items:center;justify-content:center}
+  .screen .body{padding:14px 14px 40px}
+  .modal{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.78);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:16px}
+  .sheet{width:100%;max-width:400px;background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:18px;max-height:90dvh;overflow-y:auto}
+  .toast{position:fixed;left:50%;top:70px;transform:translateX(-50%) translateY(-20px);z-index:90;background:#fff;color:#05080f;font-weight:800;font-size:13px;
+    padding:10px 16px;border-radius:14px;opacity:0;pointer-events:none;transition:.25s;max-width:88%;text-align:center}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+  /* Rank */
+  .bar-track{height:8px;border-radius:8px;background:var(--bg);overflow:hidden;border:1px solid var(--line)}
+  .bar-fill{height:100%;background:linear-gradient(90deg,var(--blue),var(--ice));transition:width .5s}
+  .rewards{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .rw{padding:10px;border-radius:14px;background:var(--bg);border:1px solid var(--line);font-size:11px;font-weight:700;display:flex;flex-direction:column;gap:6px}
+  .rw small{color:var(--muted);font-weight:600}
+  .list .item{display:flex;align-items:center;gap:12px;padding:14px 4px;border-bottom:1px solid var(--line);text-align:left;width:100%}
+  .list .item:last-child{border:0}
+  .list .ico{width:40px;height:40px;border-radius:12px;background:var(--panel2);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:18px}
+  .list b{display:block;font-size:14px} .list small{color:var(--muted);font-size:11px}
+
+  /* Roulette */
+  .rview{position:relative;height:112px;border-radius:16px;background:var(--bg);border:1px solid rgba(47,123,255,.5);overflow:hidden}
+  .rtrack{display:flex;align-items:center;height:100%;padding-left:0;will-change:transform}
+  .rcard{width:80px;height:92px;margin-right:8px;flex:none;border-radius:12px;background:var(--panel2);border:2px solid var(--line);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:11px;font-weight:800}
+  .rcard .ic{font-size:30px}
+  .rc0{border-color:#2a3a57}.rc1{border-color:var(--blue)}.rc2{border-color:var(--blue2);box-shadow:inset 0 0 18px rgba(90,162,255,.25)}.rc3{border-color:#fff;box-shadow:inset 0 0 22px rgba(255,255,255,.3)}
+  .pointer{position:absolute;left:50%;top:0;bottom:0;width:3px;margin-left:-1.5px;background:#fff;z-index:3;box-shadow:0 0 14px #fff}
+
+  /* Games */
+  .meter{position:relative;width:200px;height:200px;margin:6px auto}
+  .meter svg{width:100%;height:100%}
+  .center-txt{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none}
+  .center-txt b{font-size:30px} .center-txt span{font-size:10px;color:var(--muted);font-weight:800;letter-spacing:1px}
+  .sky{height:200px;border-radius:18px;position:relative;overflow:hidden;border:1px solid var(--line);
+    background:linear-gradient(180deg,#0a1f52,#03060d)}
+  .sky .stars{position:absolute;inset:0;background-image:radial-gradient(#fff 1px,transparent 1.5px),radial-gradient(#9cc4ff 1px,transparent 1.5px);
+    background-size:60px 60px,90px 90px;background-position:0 0,20px 30px;opacity:.55}
+  .sky.fly .stars{animation:starfall .8s linear infinite}
+  @keyframes starfall{to{background-position:0 120px,20px 210px}}
+  #rkt{position:absolute;left:50%;bottom:34px;width:64px;height:64px;margin-left:-32px;color:#fff;transition:bottom .08s linear}
+  #rkt .flame{transform-origin:50% 0;animation:flame .25s infinite alternate}
+  @keyframes flame{from{transform:scaleY(.7)}to{transform:scaleY(1.25)}}
+  #rmult{position:absolute;top:12px;left:0;right:0;text-align:center;font-size:36px;font-weight:900}
+  .boom{animation:boom .5s}
+  @keyframes boom{0%{transform:scale(1)}40%{transform:scale(1.6) rotate(8deg);filter:brightness(2)}100%{transform:scale(.2);opacity:0}}
+  .spark{animation:pop .35s}
+  @keyframes pop{0%{transform:scale(1)}40%{transform:scale(.8) rotate(-12deg)}100%{transform:scale(1)}}
+  .spin{width:34px;height:34px;border-radius:50%;border:3px solid var(--line);border-top-color:var(--blue2);animation:sp 0.8s linear infinite;margin:0 auto}
+  @keyframes sp{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+
+<!-- ============ SVG ICON SPRITE (собственные иконки) ============ -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4l-5.9 3.1 1.2-6.5L2.5 9.4l6.6-.9z"/></symbol>
+  <symbol id="i-coin" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 7.5v9h5"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-rocket" viewBox="0 0 24 24"><path d="M12 2c3 2 5 5.500 5 9.500l-2 3.500H9L7 11.500C7 7.500 9 4 12 2z"/><circle cx="12" cy="9.500" r="1.600"/><path d="M7 12l-3 3.500 3.500-.5M17 12l3 3.500-3.500-.5M10 18l2 3.500 2-3.500"/></symbol>
+  <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></symbol>
+  <symbol id="i-tree" viewBox="0 0 24 24"><path d="M12 2.500l5 6h-3l4 5.500H6L10 8.500H7z"/><path d="M12 14v7"/></symbol>
+  <symbol id="i-gift" viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M5 12v9h14v-9M12 8v13M12 8c-1-4-6-4.500-5-1.500S12 8 12 8zm0 0c1-4 6-4.500 5-1.500S12 8 12 8z"/></symbol>
+  <symbol id="i-box" viewBox="0 0 24 24"><path d="M3 7.500L12 3l9 4.500v9L12 21l-9-4.500z"/><path d="M3 7.500l9 4.500 9-4.500M12 12v9"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.500-6 8-6s8 2 8 6"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8.500" r="3.200"/><path d="M3 19c0-3.300 2.700-5.500 6-5.500s6 2.200 6 5.500"/><path d="M16 5.500a3 3 0 010 6M18 14c2 .7 3 2.300 3 5"/></symbol>
+  <symbol id="i-wallet" viewBox="0 0 24 24"><path d="M3 7a2 2 0 012-2h13v3"/><path d="M3 7v11a2 2 0 002 2h15a1 1 0 001-1v-9a1 1 0 00-1-1H5a2 2 0 01-2-2z"/><circle cx="16.500" cy="14.500" r="1.200"/></symbol>
+  <symbol id="i-gamepad" viewBox="0 0 24 24"><rect x="2.500" y="7" width="19" height="11" rx="5"/><path d="M7.500 10.500v4M5.500 12.500h4"/><circle cx="15.500" cy="11.500" r=".7"/><circle cx="18" cy="13.500" r=".7"/></symbol>
+  <symbol id="i-card" viewBox="0 0 24 24"><rect x="2.500" y="5" width="19" height="14" rx="2.500"/><path d="M2.500 10h19M6 15h4"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 4.500-3.200 7.600-8 9-4.800-1.400-8-4.500-8-9V6z"/></symbol>
+  <symbol id="i-headset" viewBox="0 0 24 24"><path d="M4 14v-2a8 8 0 0116 0v2"/><rect x="3" y="13" width="4" height="6" rx="1.500"/><rect x="17" y="13" width="4" height="6" rx="1.500"/><path d="M19 19c0 1.500-2 2.500-5 2.500"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 00-2-2H6a2 2 0 00-2 2v8a2 2 0 002 2h2"/></symbol>
+  <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+  <symbol id="i-back" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></symbol>
+  <symbol id="i-next" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></symbol>
+  <symbol id="i-tag" viewBox="0 0 24 24"><path d="M3 12V4h8l9 9-8 8z"/><circle cx="7.500" cy="8.500" r="1.200"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.500l4.500 4.500L19 7.500"/></symbol>
+  <symbol id="i-crown" viewBox="0 0 24 24"><path d="M3 8l4.500 4L12 5l4.500 7L21 8l-2 11H5z"/></symbol>
+  <symbol id="i-gem" viewBox="0 0 24 24"><path d="M6 4h12l3 5-9 11L3 9z"/><path d="M3 9h18M9 4L7 9l5 11 5-11-2-5"/></symbol>
+  <symbol id="i-medal" viewBox="0 0 24 24"><circle cx="12" cy="9" r="5.500"/><path d="M8.500 13.500L7 21l5-3 5 3-1.500-7.500"/></symbol>
+  <symbol id="i-comet" viewBox="0 0 24 24"><circle cx="16" cy="8" r="4"/><path d="M13 11L3 21M12 7L6 9M17 12l-2 6"/></symbol>
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 11l9-7 9 7M5 10v10h14V10"/></symbol>
+</svg>
+
+<div id="app">
+  <header class="top">
+    <div class="brand">
+      <div class="logo"><svg class="ic"><use href="#i-coin"/></svg></div>
+      <div><b>LOGO COINS<span class="tag">DEMO</span></b><small>Учебный проект</small></div>
+    </div>
+    <div class="bal">
+      <div class="bpill"><svg class="ic coin"><use href="#i-coin"/></svg><span id="topCoins">0</span></div>
+      <div class="bpill"><svg class="ic fill star"><use href="#i-star"/></svg><span id="topStars">0</span></div>
+      <button class="plus" onclick="nav('topup')" aria-label="Пополнить"><svg class="ic"><use href="#i-plus"/></svg></button>
+    </div>
+  </header>
+
+  <main>
+    <!-- ============ ИГРЫ ============ -->
+    <section id="v-games" class="stack">
+      <div><h2>Игры</h2><p class="sub">Заработай LOGO в «Дровосеке» и играй дальше. Стартовый баланс у всех — 0.</p></div>
+
+      <button class="cover" onclick="openGame('rocket')">
+        <svg class="art" viewBox="0 0 320 170">
+          <defs>
+            <linearGradient id="cvR" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0c2f7d"/><stop offset="1" stop-color="#03060d"/></linearGradient>
+            <linearGradient id="cvRf" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff"/><stop offset=".4" stop-color="#5aa2ff"/><stop offset="1" stop-color="#2f7bff" stop-opacity="0"/></linearGradient>
+          </defs>
+          <rect width="320" height="170" fill="url(#cvR)"/>
+          <g fill="#fff" opacity=".8"><circle cx="30" cy="28" r="1.5"/><circle cx="82" cy="70" r="1"/><circle cx="130" cy="20" r="1.4"/><circle cx="270" cy="40" r="1.5"/><circle cx="240" cy="110" r="1"/><circle cx="60" cy="130" r="1.2"/><circle cx="296" cy="90" r="1"/></g>
+          <path d="M20 160 C 90 150 150 110 230 40" stroke="#2f7bff" stroke-width="2" stroke-dasharray="4 6" fill="none" opacity=".7"/>
+          <g transform="translate(240 56) rotate(38)">
+            <path d="M-12 30 Q0 82 12 30Z" fill="url(#cvRf)"><animate attributeName="opacity" values=".6;1;.6" dur=".4s" repeatCount="indefinite"/></path>
+            <path d="M0 -58 C 22 -38 24 -2 16 32 L-16 32 C-24 -2 -22 -38 0 -58Z" fill="#fff"/>
+            <path d="M0 -58 C 22 -38 24 -2 16 32 L0 32Z" fill="#cfe3ff"/>
+            <circle cx="0" cy="-18" r="9" fill="#2f7bff" stroke="#0c2f7d" stroke-width="3"/>
+            <path d="M-16 14 L-36 40 L-16 32Z M16 14 L36 40 L16 32Z" fill="#2f7bff"/>
+          </g>
+          <text x="22" y="62" fill="#fff" font-size="40" font-weight="900" font-family="Arial">1.00x</text>
+        </svg>
+        <div class="cap"><div><b>Ракета</b><br><span>Забери выигрыш до взрыва</span></div><svg class="ic" style="font-size:22px"><use href="#i-next"/></svg></div>
+      </button>
+
+      <button class="cover" onclick="openGame('upgrade')">
+        <svg class="art" viewBox="0 0 320 170">
+          <defs><radialGradient id="cvU" cx=".5" cy=".45" r=".7"><stop offset="0" stop-color="#14337a"/><stop offset="1" stop-color="#03060d"/></radialGradient></defs>
+          <rect width="320" height="170" fill="url(#cvU)"/>
+          <circle cx="160" cy="80" r="52" fill="none" stroke="#14233d" stroke-width="14"/>
+          <g><circle cx="160" cy="80" r="52" fill="none" stroke="#2f7bff" stroke-width="14" stroke-dasharray="110 217" transform="rotate(-90 160 80)"/>
+            <animateTransform attributeName="transform" type="rotate" from="0 160 80" to="360 160 80" dur="5s" repeatCount="indefinite"/></g>
+          <path d="M160 52 L176 74 H166 V108 H154 V74 H144Z" fill="#fff"/>
+          <g stroke="#2f7bff" stroke-width="2" opacity=".5"><path d="M30 140 L70 100 M290 140 L250 100 M40 30 L74 56 M280 30 L246 56"/></g>
+        </svg>
+        <div class="cap"><div><b>Апгрейд</b><br><span>Умножай ставку до x10</span></div><svg class="ic" style="font-size:22px"><use href="#i-next"/></svg></div>
+      </button>
+
+      <button class="cover" onclick="openGame('chop')">
+        <svg class="art" viewBox="0 0 320 170">
+          <defs><linearGradient id="cvC" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0a2a6e"/><stop offset="1" stop-color="#05080f"/></linearGradient></defs>
+          <rect width="320" height="170" fill="url(#cvC)"/>
+          <circle cx="250" cy="42" r="22" fill="#f5f8ff"/><circle cx="258" cy="36" r="22" fill="#0a2a6e" opacity=".55"/>
+          <g fill="#0d1a33"><path d="M40 150 L70 70 L100 150Z"/><path d="M95 150 L132 50 L170 150Z"/><path d="M165 150 L196 82 L228 150Z"/><path d="M225 150 L252 96 L280 150Z"/></g>
+          <g fill="#5aa2ff" opacity=".85"><path d="M132 50 L146 88 H118Z"/><path d="M70 70 L80 96 H60Z"/><path d="M196 82 L206 106 H186Z"/></g>
+          <rect y="148" width="320" height="22" fill="#02040a"/>
+          <circle cx="160" cy="80" r="34" fill="none" stroke="#fff" stroke-width="3" stroke-dasharray="6 8" opacity=".35"/>
+        </svg>
+        <div class="cap"><div><b>Дровосек</b><br><span>Бесплатно зарабатывай LOGO</span></div><svg class="ic" style="font-size:22px"><use href="#i-next"/></svg></div>
+      </button>
+    </section>
+
+    <!-- ============ КЕЙСЫ ============ -->
+    <section id="v-cases" class="stack hidden">
+      <div><h2>Кейсы</h2><p class="sub">Кейсы открываются только за звёзды. Выигранные NFT-подарки можно продать за звёзды.</p></div>
+      <div id="casesGrid" class="grid2"></div>
+    </section>
+
+    <!-- ============ ПОПОЛНЕНИЕ ============ -->
+    <section id="v-topup" class="stack hidden">
+      <div><h2>Пополнить баланс</h2><p class="sub">Звёзды идут на кейсы и апгрейд, а за пополнения растёт ранг.</p></div>
+      <div class="demo"><svg class="ic"><use href="#i-shield"/></svg><span>Демо-режим: реальные платежи не проводятся, данные карты не вводятся. Звёзды виртуальные и не выводятся.</span></div>
+      <div class="seg" id="topSeg">
+        <button class="on" data-t="stars"><svg class="ic fill"><use href="#i-star"/></svg>Звёзды</button>
+        <button data-t="gifts"><svg class="ic"><use href="#i-gift"/></svg>Подарки</button>
+        <button data-t="card"><svg class="ic"><use href="#i-card"/></svg>Карта</button>
+      </div>
+      <div id="topBody"></div>
+    </section>
+
+    <!-- ============ ПРОФИЛЬ ============ -->
+    <section id="v-profile" class="stack hidden"></section>
+  </main>
+
+  <nav class="bar">
+    <button data-n="games" class="on"><svg class="ic"><use href="#i-gamepad"/></svg>Игры</button>
+    <button data-n="cases"><svg class="ic"><use href="#i-box"/></svg>Кейсы</button>
+    <button data-n="topup"><svg class="ic"><use href="#i-wallet"/></svg>Пополнить</button>
+    <button data-n="profile"><svg class="ic"><use href="#i-user"/></svg>Профиль</button>
+  </nav>
+
+  <!-- ============ ИГРА: РАКЕТА ============ -->
+  <div id="g-rocket" class="screen hidden">
+    <div class="head"><button class="iconbtn" onclick="closeGame()"><svg class="ic"><use href="#i-back"/></svg></button><h3>Ракета</h3>
+      <div class="bpill"><svg class="ic coin"><use href="#i-coin"/></svg><span class="mCoins">0</span></div></div>
+    <div class="body stack">
+      <div id="sky" class="sky">
+        <div class="stars"></div>
+        <div id="rmult">1.00x</div>
+        <svg id="rkt" viewBox="0 0 64 64">
+          <g class="flame"><path d="M26 44 Q32 66 38 44Z" fill="#5aa2ff"/><path d="M29 44 Q32 58 35 44Z" fill="#fff"/></g>
+          <path d="M32 4 C42 12 44 26 40 44 H24 C20 26 22 12 32 4Z" fill="#fff"/>
+          <circle cx="32" cy="22" r="5" fill="#2f7bff"/>
+          <path d="M24 34 L14 48 L24 44Z M40 34 L50 48 L40 44Z" fill="#2f7bff"/>
+        </svg>
+      </div>
+      <div class="card stack">
+        <div class="label">Ставка</div>
+        <div class="chips" id="rBets"></div>
+        <button id="rGo" class="btn primary" onclick="rocketGo()"><svg class="ic"><use href="#i-rocket"/></svg>Запустить</button>
+        <button id="rCash" class="btn white" onclick="rocketCash()" disabled>Забрать</button>
+        <div class="note">Ракета может взорваться в любой момент. Успей нажать «Забрать».</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ ИГРА: АПГРЕЙД ============ -->
+  <div id="g-upgrade" class="screen hidden">
+    <div class="head"><button class="iconbtn" onclick="closeGame()"><svg class="ic"><use href="#i-back"/></svg></button><h3>Апгрейд</h3>
+      <div class="bpill"><svg class="ic coin"><use href="#i-coin"/></svg><span class="mCoins">0</span></div>
+      <div class="bpill"><svg class="ic fill star"><use href="#i-star"/></svg><span class="mStars">0</span></div></div>
+    <div class="body stack">
+      <div class="card">
+        <div class="meter">
+          <svg viewBox="0 0 200 200">
+            <circle cx="100" cy="100" r="80" fill="none" stroke="#14233d" stroke-width="16"/>
+            <circle id="upArc" cx="100" cy="100" r="80" fill="none" stroke="#2f7bff" stroke-width="16" stroke-linecap="butt" transform="rotate(-90 100 100)" stroke-dasharray="0 502.65"/>
+            <g id="upPtr"><path d="M100 100 L100 14" stroke="#fff" stroke-width="3" stroke-linecap="round"/><path d="M100 8 L94 22 H106Z" fill="#fff"/></g>
+            <circle cx="100" cy="100" r="7" fill="#fff"/>
+          </svg>
+          <div class="center-txt" style="padding-top:44px"><b id="upChance">46%</b><span>ШАНС</span></div>
+        </div>
+        <div id="upStatus" class="sub" style="text-align:center;margin:0;min-height:18px">Выбери ставку и множитель</div>
+      </div>
+      <div class="card stack">
+        <div><div class="label">1. Что ставим</div>
+          <div class="seg" id="upCur"><button class="on" data-c="coins"><svg class="ic coin"><use href="#i-coin"/></svg>LOGO</button><button data-c="stars"><svg class="ic fill star"><use href="#i-star"/></svg>Звёзды</button></div>
+          <div class="chips" id="upAmts" style="margin-top:10px"></div></div>
+        <div><div class="label">2. Во сколько раз умножить</div><div class="chips" id="upMults"></div></div>
+        <div class="demo" id="upSummary"></div>
+        <button id="upGo" class="btn primary" onclick="upSpin()"><svg class="ic"><use href="#i-bolt"/></svg>Сделать апгрейд</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ ИГРА: ДРОВОСЕК ============ -->
+  <div id="g-chop" class="screen hidden">
+    <div class="head"><button class="iconbtn" onclick="closeGame()"><svg class="ic"><use href="#i-back"/></svg></button><h3>Дровосек</h3>
+      <div class="bpill"><svg class="ic coin"><use href="#i-coin"/></svg><span class="mCoins">0</span></div></div>
+    <div class="body stack">
+      <div class="card" style="text-align:center">
+        <div class="row" style="font-size:12px;font-weight:800;margin-bottom:10px">
+          <span>Уровень <span id="chLvl">1</span>/6</span><span>Комбо x<span id="chCombo">1</span></span><span class="coin">+<span id="chRew">5</span> LOGO</span>
+        </div>
+        <div class="bar-track"><div id="chHp" class="bar-fill" style="width:100%"></div></div>
+        <div class="meter" style="width:190px;height:190px">
+          <svg viewBox="0 0 200 200">
+            <circle cx="100" cy="100" r="86" fill="none" stroke="#14233d" stroke-width="10"/>
+            <path d="M72 18 A86 86 0 0 1 128 18" fill="none" stroke="#fff" stroke-width="10" stroke-linecap="round"/>
+            <g id="chNeedle"><path d="M100 100 L100 26" stroke="#5aa2ff" stroke-width="4" stroke-linecap="round"/><circle cx="100" cy="24" r="6" fill="#2f7bff" stroke="#fff" stroke-width="2"/></g>
+          </svg>
+          <div class="center-txt"><svg id="chTree" class="ic" style="font-size:64px;color:var(--ice)"><use href="#i-tree"/></svg></div>
+        </div>
+        <div id="chStatus" style="min-height:20px;font-weight:800;font-size:13px">Останови стрелку в белой зоне сверху</div>
+        <button class="btn primary" style="margin-top:12px" onclick="chopHit()">Удар!</button>
+      </div>
+      <div class="note">Бесплатная игра: здесь можно заработать первые LOGO с нулевого баланса.</div>
+    </div>
+  </div>
+
+  <!-- ============ МОДАЛКИ ============ -->
+  <div id="mRoulette" class="modal hidden"><div class="sheet" style="text-align:center">
+    <h3 id="rlName" style="margin:0 0 12px">Кейс</h3>
+    <div class="rview" id="rlView"><div class="pointer"></div><div id="rlTrack" class="rtrack"></div></div>
+    <div id="rlPrize" class="hidden" style="margin:16px 0 6px"><div class="label">Твой приз</div><div id="rlPrizeTxt" style="font-size:22px;font-weight:900"></div></div>
+    <button id="rlClaim" class="btn primary" style="margin-top:14px" disabled onclick="$('mRoulette').classList.add('hidden')">Забрать</button>
+  </div></div>
+
+  <div id="mResult" class="modal hidden"><div class="sheet" style="text-align:center">
+    <div id="resIc" style="font-size:44px;margin-bottom:6px"></div>
+    <h3 id="resTitle" style="margin:0 0 6px"></h3>
+    <p id="resText" class="sub" style="margin:0 0 14px"></p>
+    <button class="btn primary" onclick="$('mResult').classList.add('hidden')">Ок</button>
+  </div></div>
+
+  <div id="mPay" class="modal hidden"><div class="sheet" style="text-align:center">
+    <div class="spin"></div><h3 style="margin:14px 0 4px">Обработка платежа</h3><p class="sub" style="margin:0">Демо-режим, деньги не списываются</p>
+  </div></div>
+
+  <div id="mSupport" class="modal hidden"><div class="sheet stack">
+    <div class="row"><h3 style="margin:0">Поддержка</h3><button class="iconbtn" onclick="$('mSupport').classList.add('hidden')"><svg class="ic"><use href="#i-close"/></svg></button></div>
+    <p class="sub" style="margin:0">Вопросы по проекту, баланс, ошибки — напиши нам.</p>
+    <button class="btn primary" onclick="openLink('https://t.me/merertd')"><svg class="ic"><use href="#i-headset"/></svg>Написать @merertd</button>
+    <div class="note">Ответим на вопросы 24/7. Контакт в Telegram: <b>@merertd</b></div>
+  </div></div>
+
+  <div id="mPromo" class="modal hidden"><div class="sheet stack">
+    <div class="row"><h3 style="margin:0">Промокод</h3><button class="iconbtn" onclick="$('mPromo').classList.add('hidden')"><svg class="ic"><use href="#i-close"/></svg></button></div>
+    <input id="promoIn" placeholder="Введи код" style="width:100%;padding:13px;border-radius:14px;border:1px solid var(--line);background:var(--bg);color:#fff;text-transform:uppercase">
+    <button class="btn primary" onclick="applyPromo()">Применить</button>
+  </div></div>
+
+  <div id="mRanks" class="modal hidden"><div class="sheet stack">
+    <div class="row"><h3 style="margin:0">Все ранги</h3><button class="iconbtn" onclick="$('mRanks').classList.add('hidden')"><svg class="ic"><use href="#i-close"/></svg></button></div>
+    <div id="ranksList" class="list"></div>
+  </div></div>
+
+  <div id="toast" class="toast"></div>
+</div>
+
+<script>
+/* ===================== УТИЛИТЫ ===================== */
+const $ = id => document.getElementById(id);
+const fmt = n => Math.round(n).toLocaleString('ru-RU');
+const ic = (n, c = '') => `<svg class="ic ${c}"><use href="#i-${n}"/></svg>`;
+const BOT_USERNAME = 'logocoins_bot';      // подставь юзернейм своего бота
+const SUPPORT = '@merertd';
+
+const tg = window.Telegram && window.Telegram.WebApp;
+try { if (tg) { tg.ready(); tg.expand(); tg.setHeaderColor && tg.setHeaderColor('#05080f'); tg.setBackgroundColor && tg.setBackgroundColor('#05080f'); } } catch (e) {}
+const U = (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) || { id: 0, first_name: 'Гость', username: '' };
+
+function openLink(url) {
+  try { if (tg && tg.openTelegramLink && url.startsWith('https://t.me/')) return tg.openTelegramLink(url); } catch (e) {}
+  window.open(url, '_blank');
+}
+let toastT;
+function toast(msg) {
+  const t = $('toast'); t.textContent = msg; t.classList.add('show');
+  clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 2400);
+}
+function showResult(icon, title, text) {
+  $('resIc').innerHTML = icon; $('resTitle').textContent = title; $('resText').textContent = text;
+  $('mResult').classList.remove('hidden');
+}
+
+/* ===================== ЗВУК ===================== */
+const sound = {
+  ctx: null,
+  _i() { if (!this.ctx) { const A = window.AudioContext || window.webkitAudioContext; if (A) this.ctx = new A(); } if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume(); return this.ctx; },
+  _beep(f, d, type = 'sine', v = .1, at = 0) {
+    const c = this._i(); if (!c) return;
+    const o = c.createOscillator(), g = c.createGain(), t = c.currentTime + at;
+    o.type = type; o.frequency.setValueAtTime(f, t);
+    g.gain.setValueAtTime(v, t); g.gain.exponentialRampToValueAtTime(.001, t + d);
+    o.connect(g); g.connect(c.destination); o.start(t); o.stop(t + d);
+  },
+  tick() { this._beep(620, .05, 'sine', .07); },
+  win() { [440, 554, 659, 880].forEach((f, i) => this._beep(f, .12, 'sine', .15, i * .09)); },
+  boom() { this._beep(120, .35, 'sawtooth', .25); }
+};
+
+/* ===================== СОСТОЯНИЕ И СЕРВЕРНАЯ СИНХРОНИЗАЦИЯ ===================== */
+const KEY = 'logo_demo_v2_' + U.id;
+let S = { coins: 0, stars: 0, deposited: 0, claimed: {}, inv: [], lastFree: 0, promos: {} };
+try { const raw = localStorage.getItem(KEY); if (raw) S = Object.assign(S, JSON.parse(raw)); } catch (e) {}
+
+let pendingStarsDelta = 0;
+let syncTimeout = null;
+
+async function syncWithServer(starsDelta = 0) {
+  pendingStarsDelta += starsDelta;
+  clearTimeout(syncTimeout);
+  syncTimeout = setTimeout(async () => {
+    if (!tg || !tg.initData) return;
+    try {
+      const deltaToSend = pendingStarsDelta;
+      pendingStarsDelta = 0;
+      const res = await fetch('/api/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          init_data: tg.initData,
+          state: {
+            coins: S.coins,
+            stars_delta: deltaToSend,
+            last_free: S.lastFree,
+            rank_claims: S.claimed,
+            inventory: S.inv,
+            promos: S.promos
+          }
+        })
+      });
+      const data = await res.json();
+      if (data && data.ok) {
+        S.stars = data.stars;
+        S.deposited = data.deposited;
+        try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {}
+        ui();
+      }
+    } catch (e) {
+      console.warn('Sync error:', e);
+    }
+  }, 400);
+}
+
+async function loadUserFromServer() {
+  if (!tg || !tg.initData) return;
+  try {
+    const res = await fetch('/api/user', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ init_data: tg.initData })
+    });
+    const data = await res.json();
+    if (data && data.ok && data.user) {
+      S.coins = Math.max(S.coins, data.user.coins || 0);
+      S.stars = data.user.stars || 0;
+      S.deposited = data.user.deposited || 0;
+      S.lastFree = Math.max(S.lastFree || 0, data.user.last_free || 0);
+      S.claimed = Object.assign(S.claimed || {}, data.user.rank_claims || {});
+      S.inv = (data.user.inventory && data.user.inventory.length) ? data.user.inventory : S.inv;
+      S.promos = Object.assign(S.promos || {}, data.user.promos || {});
+      try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {}
+      ui();
+    }
+  } catch (e) {
+    console.warn('Fetch user error:', e);
+  }
+}
+
+function save(starsDelta = 0) {
+  try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {}
+  syncWithServer(starsDelta);
+}
+function ui() {
+  $('topCoins').textContent = fmt(S.coins); $('topStars').textContent = fmt(S.stars);
+  document.querySelectorAll('.mCoins').forEach(e => e.textContent = fmt(S.coins));
+  document.querySelectorAll('.mStars').forEach(e => e.textContent = fmt(S.stars));
+  if (!$('v-profile').classList.contains('hidden')) renderProfile();
+}
+
+/* ===================== НАВИГАЦИЯ ===================== */
+let curTab = 'games';
+function nav(t) {
+  curTab = t;
+  ['games', 'cases', 'topup', 'profile'].forEach(x => $('v-' + x).classList.toggle('hidden', x !== t));
+  document.querySelectorAll('nav.bar button').forEach(b => b.classList.toggle('on', b.dataset.n === t));
+  if (t === 'cases') renderCases();
+  if (t === 'topup') renderTopup();
+  if (t === 'profile') renderProfile();
+  window.scrollTo(0, 0);
+}
+document.querySelectorAll('nav.bar button').forEach(b => b.onclick = () => nav(b.dataset.n));
+
+let openedGame = null;
+function openGame(id) {
+  openedGame = id; $('g-' + id).classList.remove('hidden');
+  $('g-' + id).scrollTop = 0;
+  if (id === 'chop') chopStart();
+  if (id === 'rocket') renderBets();
+  if (id === 'upgrade') upInit();
+  ui();
+}
+function closeGame() {
+  if (R.active) { toast('Сначала забери выигрыш или дождись взрыва'); return; }
+  if (U_.busy) { toast('Подожди, колесо крутится'); return; }
+  chopStop();
+  if (openedGame) $('g-' + openedGame).classList.add('hidden');
+  openedGame = null;
+}
+
+/* ===================== РАНГИ ===================== */
+const RANKS = [
+  { n: 'Новичок', min: 0 },
+  { n: 'Рядовой', min: 50 },
+  { n: 'Профи', min: 150, r: { type: 'star', v: 10, t: '+10 звёзд' } },
+  { n: 'Элита', min: 400, r: { type: 'star', v: 30, t: '+30 звёзд' } },
+  { n: 'Легенда', min: 1000, r: { type: 'nft', name: 'Корона', icon: 'crown', v: 100, t: 'NFT «Корона»' } }
+];
+function rankIdx() { let k = 0; RANKS.forEach((r, i) => { if (S.deposited >= r.min) k = i; }); return k; }
+
+function claimRank(i) {
+  const r = RANKS[i];
+  if (!r.r || S.deposited < r.min || S.claimed[i]) return;
+  S.claimed[i] = true;
+  let dStars = 0;
+  if (r.r.type === 'star') { S.stars += r.r.v; dStars = r.r.v; }
+  else S.inv.push({ id: Date.now(), name: r.r.name, icon: r.r.icon, v: r.r.v });
+  save(dStars); ui(); sound.win(); toast('Награда получена: ' + r.r.t);
+}
+
+function renderProfile() {
+  const ri = rankIdx(), cur = RANKS[ri], nxt = RANKS[ri + 1];
+  const prog = nxt ? Math.min(100, (S.deposited - cur.min) / (nxt.min - cur.min) * 100) : 100;
+  const name = (U.first_name || 'Игрок') + (U.last_name ? ' ' + U.last_name : '');
+  const inv = S.inv.length ? S.inv.map(it => `
+      <div class="card" style="padding:10px;text-align:center">
+        <div style="font-size:26px;color:var(--ice)">${ic(it.icon)}</div>
+        <div style="font-size:12px;font-weight:800;margin:4px 0">${it.name}</div>
+        <button class="btn sm" style="width:100%" onclick="sellItem(${it.id})">Продать ${it.v} ${ic('star', 'fill star')}</button>
+      </div>`).join('') : '<div class="note" style="grid-column:1/-1">Пока пусто. NFT-подарки из кейсов появятся здесь.</div>';
+  $('v-profile').innerHTML = `
+    <div class="card" style="text-align:center">
+      <div style="width:78px;height:78px;border-radius:50%;margin:0 auto 10px;background:linear-gradient(145deg,var(--blue),#1747b8);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:900;box-shadow:0 0 28px rgba(47,123,255,.5)">${(name[0] || 'И').toUpperCase()}</div>
+      <b style="font-size:17px">${name}</b>
+      <div class="note">${U.username ? '@' + U.username : 'без username'} · ID ${U.id || '—'}</div>
+      <div class="grid2" style="grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px">
+        <div class="rw" style="align-items:center"><small>ЗВЁЗДЫ</small><b style="font-size:16px">${fmt(S.stars)}</b></div>
+        <div class="rw" style="align-items:center"><small>ПОПОЛНЕНО</small><b style="font-size:16px">${fmt(S.deposited)}</b></div>
+        <div class="rw" style="align-items:center"><small>ПРЕДМЕТЫ</small><b style="font-size:16px">${S.inv.length}</b></div>
+      </div>
+    </div>
+
+    <div class="card stack">
+      <div class="row"><div style="display:flex;gap:12px;align-items:center"><div class="ico" style="width:46px;height:46px;border-radius:14px;background:var(--bg);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:24px">${ic('shield')}</div>
+        <div><div class="note">ТВОЙ РАНГ</div><b style="font-size:21px">${cur.n}</b></div></div>
+        <button class="note" style="font-weight:800" onclick="showRanks()">Все ранги ${ic('next')}</button></div>
+      <div class="bar-track"><div class="bar-fill" style="width:${prog}%"></div></div>
+      <div class="note">${nxt ? `До ранга «${nxt.n}» осталось: <b>${fmt(nxt.min - S.deposited)}</b> звёзд пополнений` : 'Максимальный ранг достигнут'}</div>
+      <div class="rewards">${RANKS.map((r, i) => r.r ? `
+        <div class="rw"><span>${r.r.t}</span><small>Ранг «${r.n}»</small>
+          <button class="btn sm ${S.claimed[i] ? '' : 'primary'}" ${(S.deposited < r.min || S.claimed[i]) ? 'disabled' : ''} onclick="claimRank(${i})">${S.claimed[i] ? 'Получено' : 'Забрать'}</button></div>` : '').join('')}</div>
+    </div>
+
+    <div><div class="label">Инвентарь</div><div class="grid2" style="grid-template-columns:repeat(3,1fr);gap:8px">${inv}</div></div>
+
+    <div class="label" style="margin-top:6px">Сервисы</div>
+    <div class="card list" style="padding:4px 14px">
+      <button class="item" onclick="copyRef()"><div class="ico">${ic('users')}</div><div style="flex:1"><b>Пригласить друзей</b><small>Скопируй ссылку и отправь друзьям</small></div>${ic('next')}</button>
+      <button class="item" onclick="$('mPromo').classList.remove('hidden')"><div class="ico">${ic('tag')}</div><div style="flex:1"><b>Промокоды</b><small>Бонусы по кодам</small></div>${ic('next')}</button>
+      <button class="item" onclick="$('mSupport').classList.remove('hidden')"><div class="ico">${ic('headset')}</div><div style="flex:1"><b>Поддержка</b><small>Ответим на вопросы 24/7 · ${SUPPORT}</small></div>${ic('next')}</button>
+    </div>`;
+}
+function showRanks() {
+  $('ranksList').innerHTML = RANKS.map((r, i) => `
+    <div class="item"><div class="ico">${ic('shield')}</div><div style="flex:1"><b>${r.n}${i === rankIdx() ? ' · ты здесь' : ''}</b>
+    <small>от ${fmt(r.min)} звёзд пополнений${r.r ? ' · ' + r.r.t : ''}</small></div></div>`).join('');
+  $('mRanks').classList.remove('hidden');
+}
+function sellItem(id) {
+  const i = S.inv.findIndex(x => x.id === id); if (i < 0) return;
+  const it = S.inv.splice(i, 1)[0]; S.stars += it.v; save(it.v); ui(); sound.win(); toast(`Продано: +${it.v} звёзд`);
+}
+function copyRef() {
+  const link = `https://t.me/${BOT_USERNAME}?start=ref_${U.id}`;
+  const done = () => toast('Ссылка скопирована');
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(link).then(done, () => toast(link));
+  else toast(link);
+}
+function applyPromo() {
+  const code = $('promoIn').value.trim().toUpperCase(); if (!code) return;
+  const PROMOS = { LOGO10: { stars: 10 }, STUDENT: { coins: 500 } };
+  const p = PROMOS[code];
+  if (!p) { toast('Такого промокода нет'); return; }
+  if (S.promos[code]) { toast('Промокод уже использован'); return; }
+  S.promos[code] = true;
+  const dStars = p.stars || 0;
+  S.stars += dStars;
+  S.coins += p.coins || 0;
+  save(dStars); ui(); sound.win();
+  $('mPromo').classList.add('hidden'); $('promoIn').value = '';
+  toast('Промокод активирован');
+}
+
+/* ===================== ПОПОЛНЕНИЕ ===================== */
+let topMode = 'stars', cardBrand = 'Visa', cardAmt = 25000;
+document.querySelectorAll('#topSeg button').forEach(b => b.onclick = () => { topMode = b.dataset.t; renderTopup(); });
+const GIFTS = [
+  { name: 'Медаль', icon: 'medal', v: 25 }, { name: 'Кристалл', icon: 'gem', v: 50 },
+  { name: 'Корона', icon: 'crown', v: 100 }, { name: 'Комета', icon: 'comet', v: 250 }
+];
+
+async function buyStars(stars) {
+  if (!tg || !tg.openInvoice) {
+    fakePay('Telegram Stars (Demo)', stars);
+    return;
+  }
+  $('mPay').classList.remove('hidden');
+  try {
+    const res = await fetch('/api/create-invoice', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ init_data: tg.initData, amount: stars })
+    });
+    const data = await res.json();
+    $('mPay').classList.add('hidden');
+    if (!data.ok || !data.url) {
+      toast(data.error || 'Ошибка создания счёта');
+      return;
+    }
+    // Вызываем нативное окно оплаты Telegram Stars
+    tg.openInvoice(data.url, async (status) => {
+      if (status === 'paid') {
+        sound.win();
+        toast('Оплата прошла успешно! ⭐');
+        // Обновляем данные с сервера
+        await loadUserFromServer();
+        showResult(ic('check', 'star'), 'Оплата Stars', `Успешно начислено ${stars} ⭐!`);
+      } else if (status === 'failed') {
+        toast('Ошибка при оплате');
+      }
+    });
+  } catch (err) {
+    $('mPay').classList.add('hidden');
+    toast('Сетевая ошибка при создании счёта');
+  }
+}
+
+function renderTopup() {
+  document.querySelectorAll('#topSeg button').forEach(b => b.classList.toggle('on', b.dataset.t === topMode));
+  const el = $('topBody');
+  if (topMode === 'stars') {
+    el.innerHTML = `<div class="grid2">${[10, 25, 50, 100, 250, 500].map(n => `
+      <button class="card" style="text-align:center" onclick="buyStars(${n})">
+        <div style="font-size:26px">${ic('star', 'fill star')}</div><b style="font-size:20px">${n}</b><div class="note">звёзд (XTR)</div></button>`).join('')}</div>`;
+  } else if (topMode === 'gifts') {
+    el.innerHTML = `<p class="note" style="margin-top:0">Отправь подарок — его стоимость зачислится на баланс звёзд.</p>
+      <div class="grid2">${GIFTS.map(g => `
+      <button class="card" style="text-align:center" onclick="fakePay('Подарок «${g.name}»', ${g.v})">
+        <div style="font-size:34px;color:var(--ice)">${ic(g.icon)}</div><b>${g.name}</b><div class="note">+${g.v} ${ic('star', 'fill star')}</div></button>`).join('')}</div>`;
+  } else {
+    const stars = Math.round(cardAmt / 250);
+    el.innerHTML = `<div class="card stack">
+      <div class="label">Платёжная система</div>
+      <div class="seg" id="brandSeg"><button class="${cardBrand === 'Visa' ? 'on' : ''}" data-b="Visa">${ic('card')}Visa</button><button class="${cardBrand === 'Uzcard' ? 'on' : ''}" data-b="Uzcard">${ic('card')}Uzcard</button></div>
+      <div class="label">Сумма, сум</div>
+      <div class="chips">${[10000, 25000, 50000, 100000].map(a => `<button class="chip ${a === cardAmt ? 'on' : ''}" data-a="${a}">${fmt(a)}</button>`).join('')}</div>
+      <div class="demo"><span>Получишь: <b>${stars}</b> звёзд · демо-курс 250 сум = 1 звезда</span></div>
+      <button class="btn primary">Оплатить (демо)</button></div>`;
+    el.querySelectorAll('#brandSeg button').forEach(b => b.onclick = () => { cardBrand = b.dataset.b; renderTopup(); });
+    el.querySelectorAll('[data-a]').forEach(b => b.onclick = () => { cardAmt = +b.dataset.a; renderTopup(); });
+    el.querySelector('.btn.primary').onclick = () => fakePay(cardBrand, stars);
+  }
+}
+function fakePay(title, stars) {
+  $('mPay').classList.remove('hidden');
+  setTimeout(() => {
+    $('mPay').classList.add('hidden');
+    const before = rankIdx();
+    S.stars += stars; S.deposited += stars; save(stars); ui(); sound.win();
+    const after = rankIdx();
+    showResult(ic('check', 'star'), 'Пополнение успешно', `${title}: начислено ${stars} звёзд (демо).` + (after > before ? ` Новый ранг: «${RANKS[after].n}»!` : ''));
+  }, 1400);
+}
+
+/* ===================== КЕЙСЫ (ТОЛЬКО ЗА ЗВЁЗДЫ) ===================== */
+const TIERS = [
+  { id: 'start', name: 'Старт', price: 10, c: ['#5aa2ff', '#2f7bff', '#1a4fc4', '#0c2a73'] },
+  { id: 'ice', name: 'Лёд', price: 25, c: ['#cfe3ff', '#8fbaff', '#4a85e8', '#1f4fa6'] },
+  { id: 'orbit', name: 'Орбита', price: 50, c: ['#9cc4ff', '#3f84ff', '#2155c9', '#10296b'] },
+  { id: 'crown', name: 'Корона', price: 100, c: ['#ffffff', '#cfe3ff', '#5aa2ff', '#2a4f9a'] }
+];
+const NFTS = [{ n: 'Медаль', i: 'medal' }, { n: 'Кристалл', i: 'gem' }, { n: 'Комета', i: 'comet' }, { n: 'Корона', i: 'crown' }];
+function casePrizes(ti) {
+  const P = TIERS[ti].price;
+  const a = NFTS[ti], b = NFTS[Math.min(3, ti + 1)];
+  return [
+    { t: 'star', v: Math.max(1, Math.round(P * .2)), w: 40 }, { t: 'star', v: Math.round(P * .5), w: 30 },
+    { t: 'star', v: P, w: 15 }, { t: 'star', v: Math.round(P * 1.5), w: 8 },
+    { t: 'nft', n: a.n, i: a.i, v: Math.round(P * 2.5), w: 5 }, { t: 'nft', n: b.n, i: b.i, v: P * 5, w: 2 }
+  ];
+}
+const FREE_PRIZES = [
+  { t: 'coin', v: 25, w: 40 }, { t: 'coin', v: 100, w: 25 }, { t: 'star', v: 1, w: 20 },
+  { t: 'star', v: 3, w: 10 }, { t: 'star', v: 5, w: 4 }, { t: 'star', v: 10, w: 1 }
+];
+function caseArt(c, id) {
+  return `<svg viewBox="0 0 120 120"><defs><radialGradient id="gl${id}" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="${c[1]}" stop-opacity=".55"/><stop offset="1" stop-color="${c[1]}" stop-opacity="0"/></radialGradient></defs>
+    <circle cx="60" cy="62" r="56" fill="url(#gl${id})"/>
+    <path d="M60 16 L102 38 L60 60 L18 38Z" fill="${c[0]}"/><path d="M18 38 L60 60 V106 L18 84Z" fill="${c[2]}"/><path d="M102 38 L60 60 V106 L102 84Z" fill="${c[3]}"/>
+    <path d="M60 60 V106" stroke="#fff" stroke-width="2" opacity=".5"/><path d="M60 16 L60 60" stroke="#fff" stroke-width="1.5" opacity=".4"/>
+    <use href="#i-star" x="50" y="26" width="20" height="20" fill="#05080f" opacity=".75"/></svg>`;
+}
+function maxPrize(ti) { return Math.max(...casePrizes(ti).map(p => p.v)); }
+function renderCases() {
+  $('casesGrid').innerHTML = TIERS.map((t, i) => `
+    <div class="card case">${caseArt(t.c, t.id)}<b>${t.name}</b><small>призы до ${maxPrize(i)} звёзд</small>
+      <button class="btn primary sm" style="width:100%" onclick="openCase(${i})">${t.price} ${ic('star', 'fill')}</button></div>`).join('') + `
+    <div class="card case" style="grid-column:1/-1;display:flex;align-items:center;gap:14px;text-align:left">
+      <div style="font-size:42px;color:var(--ice)">${ic('gift')}</div>
+      <div style="flex:1"><b style="margin:0">Ежедневный кейс</b><small style="margin:2px 0 0">Раз в 24 часа, бесплатно</small></div>
+      <button id="freeBtn" class="btn sm white" style="width:auto" onclick="openCase(-1)">Крутить</button></div>`;
+  updateFree();
+}
+function updateFree() {
+  const b = $('freeBtn'); if (!b) return;
+  const left = S.lastFree + 864e5 - Date.now();
+  if (left > 0) { const s = Math.floor(left / 1000); b.disabled = true; b.textContent = `${String(Math.floor(s / 3600)).padStart(2, '0')}:${String(Math.floor(s % 3600 / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`; }
+  else { b.disabled = false; b.textContent = 'Крутить'; }
+}
+setInterval(() => { if (curTab === 'cases') updateFree(); }, 1000);
+
+function pickW(list) { let r = Math.random() * list.reduce((s, p) => s + p.w, 0); for (const p of list) { if ((r -= p.w) < 0) return p; } return list[0]; }
+function prizeCard(p, price) {
+  const k = !price ? 1 : p.v / price < 1 ? 0 : p.v / price < 2 ? 1 : p.v / price < 3 ? 2 : 3;
+  const icon = p.t === 'nft' ? ic(p.i) : p.t === 'coin' ? ic('coin', 'coin') : ic('star', 'fill star');
+  const label = p.t === 'nft' ? p.n : (p.t === 'coin' ? p.v + ' LOGO' : p.v + ' зв.');
+  return `<div class="rcard rc${k}">${icon}<span>${label}</span></div>`;
+}
+let rlBusy = false;
+function openCase(ti) {
+  if (rlBusy) return;
+  const free = ti < 0, price = free ? 0 : TIERS[ti].price, pool = free ? FREE_PRIZES : casePrizes(ti);
+  if (free) { if (Date.now() - S.lastFree < 864e5) return; }
+  else if (S.stars < price) { toast('Не хватает звёзд — пополни баланс'); nav('topup'); return; }
+
+  const win = pickW(pool);
+  // списание и награда фиксируются сразу, анимация только показывает результат
+  let dStars = 0;
+  if (free) {
+    S.lastFree = Date.now();
+  } else {
+    S.stars -= price;
+    dStars -= price;
+  }
+  if (win.t === 'star') {
+    S.stars += win.v;
+    dStars += win.v;
+  } else if (win.t === 'coin') {
+    S.coins += win.v;
+  } else {
+    S.inv.push({ id: Date.now(), name: win.n, icon: win.i, v: win.v });
+  }
+  save(dStars);
+
+  rlBusy = true;
+  $('rlName').textContent = free ? 'Ежедневный кейс' : 'Кейс «' + TIERS[ti].name + '»';
+  $('rlPrize').classList.add('hidden'); $('rlClaim').disabled = true;
+  const N = 46, TARGET = 38, track = $('rlTrack'); let html = '';
+  for (let i = 0; i < N; i++) html += prizeCard(i === TARGET ? win : pickW(pool), price);
+  track.style.transition = 'none'; track.style.transform = 'translateX(0)'; track.innerHTML = html;
+  $('mRoulette').classList.remove('hidden');
+
+  const vw = $('rlView').clientWidth, jitter = (Math.random() - .5) * 50;
+  const off = -(TARGET * 88 + 40 - vw / 2 + jitter);
+  let ticks = 0; const ti2 = setInterval(() => { sound.tick(); if (++ticks > 34) clearInterval(ti2); }, 130);
+  setTimeout(() => { track.style.transition = 'transform 4.6s cubic-bezier(.12,.75,.15,1)'; track.style.transform = `translateX(${off}px)`; }, 60);
+  setTimeout(() => {
+    sound.win();
+    $('rlPrizeTxt').innerHTML = win.t === 'nft' ? `${ic(win.i)} ${win.n} · ${win.v} ${ic('star', 'fill star')}` :
+      win.t === 'coin' ? `${ic('coin', 'coin')} +${win.v} LOGO` : `${ic('star', 'fill star')} +${win.v} звёзд`;
+    $('rlPrize').classList.remove('hidden'); $('rlClaim').disabled = false;
+    rlBusy = false; ui(); if (curTab === 'cases') renderCases();
+  }, 4800);
+}
+
+/* ===================== ИГРА: РАКЕТА ===================== */
+const R = { bet: 10, active: false, m: 1, crash: 2, raf: 0, t0: 0 };
+function renderBets() {
+  $('rBets').innerHTML = [10, 50, 100, 500].map(b => `<button class="chip ${b === R.bet ? 'on' : ''}" data-b="${b}">${b}</button>`).join('');
+  $('rBets').querySelectorAll('button').forEach(b => b.onclick = () => { if (R.active) return; R.bet = +b.dataset.b; renderBets(); });
+}
+function rocketGo() {
+  if (R.active) return;
+  if (S.coins < R.bet) { toast('Не хватает LOGO — заработай их в «Дровосеке» или открой ежедневный кейс'); return; }
+  S.coins -= R.bet; save(); ui();
+  R.active = true; R.m = 1; R.t0 = performance.now();
+  R.crash = Math.min(50, Math.max(1.02, 0.96 / (1 - Math.random())));
+  $('rGo').disabled = true; $('rCash').disabled = false;
+  $('sky').classList.add('fly');
+  const rk = $('rkt'); rk.classList.remove('boom'); rk.style.opacity = 1; rk.style.bottom = '34px';
+  const loop = now => {
+    if (!R.active) return;
+    R.m = Math.exp(0.14 * (now - R.t0) / 1000);
+    if (R.m >= R.crash) { return rocketCrash(); }
+    $('rmult').textContent = R.m.toFixed(2) + 'x';
+    $('rCash').textContent = 'Забрать ' + fmt(R.bet * R.m) + ' LOGO';
+    rk.style.bottom = (34 + Math.min(70, (R.m - 1) * 22)) + 'px';
+    R.raf = requestAnimationFrame(loop);
+  };
+  R.raf = requestAnimationFrame(loop);
+}
+function rocketEnd() {
+  R.active = false; cancelAnimationFrame(R.raf);
+  $('sky').classList.remove('fly'); $('rGo').disabled = false; $('rCash').disabled = true; $('rCash').textContent = 'Забрать';
+}
+function rocketCrash() {
+  const m = R.crash; rocketEnd(); sound.boom();
+  $('rmult').textContent = m.toFixed(2) + 'x';
+  $('rkt').classList.add('boom');
+  showResult(ic('rocket'), 'Ракета взорвалась', `Взрыв на x${m.toFixed(2)}. Ставка ${R.bet} LOGO сгорела.`);
+}
+function rocketCash() {
+  if (!R.active) return;
+  const m = R.m, won = Math.round(R.bet * m); rocketEnd();
+  S.coins += won; save(); ui(); sound.win();
+  showResult(ic('check', 'star'), 'Ты успел!', `Множитель x${m.toFixed(2)}. Выигрыш: +${fmt(won)} LOGO.`);
+}
+
+/* ===================== ИГРА: АПГРЕЙД ===================== */
+const U_ = { cur: 'coins', amt: 50, mult: 2, busy: false, rot: 0 };
+const AMTS = { coins: [50, 100, 250, 500], stars: [5, 10, 25, 50] };
+const MULTS = [1.5, 2, 3, 5, 10];
+const chanceOf = m => Math.round(92 / m);
+document.querySelectorAll('#upCur button').forEach(b => b.onclick = () => {
+  if (U_.busy) return; U_.cur = b.dataset.c; U_.amt = AMTS[U_.cur][0]; upInit();
+});
+function upInit() {
+  document.querySelectorAll('#upCur button').forEach(b => b.classList.toggle('on', b.dataset.c === U_.cur));
+  $('upAmts').innerHTML = AMTS[U_.cur].map(a => `<button class="chip ${a === U_.amt ? 'on' : ''}" data-a="${a}">${a}</button>`).join('');
+  $('upMults').innerHTML = MULTS.map(m => `<button class="chip ${m === U_.mult ? 'on' : ''}" data-m="${m}">x${m}</button>`).join('');
+  $('upAmts').querySelectorAll('button').forEach(b => b.onclick = () => { if (U_.busy) return; U_.amt = +b.dataset.a; upInit(); });
+  $('upMults').querySelectorAll('button').forEach(b => b.onclick = () => { if (U_.busy) return; U_.mult = +b.dataset.m; upInit(); });
+  const ch = chanceOf(U_.mult), C = 2 * Math.PI * 80, unit = U_.cur === 'coins' ? 'LOGO' : 'звёзд';
+  $('upChance').textContent = ch + '%';
+  $('upArc').setAttribute('stroke-dasharray', `${ch / 100 * C} ${C}`);
+  $('upSummary').innerHTML = `<span>Ставка <b>${U_.amt} ${unit}</b> → выигрыш <b>${Math.round(U_.amt * U_.mult)} ${unit}</b> при шансе <b>${ch}%</b>. Если стрелка остановится на синей части, ставка умножится.</span>`;
+  ui();
+}
+function upSpin() {
+  if (U_.busy) return;
+  const have = U_.cur === 'coins' ? S.coins : S.stars;
+  if (have < U_.amt) { toast(U_.cur === 'coins' ? 'Не хватает LOGO' : 'Не хватает звёзд — пополни баланс'); return; }
+  let dStars = 0;
+  if (U_.cur === 'coins') {
+    S.coins -= U_.amt;
+    save();
+  } else {
+    S.stars -= U_.amt;
+    dStars -= U_.amt;
+    save(dStars);
+  }
+  const ch = chanceOf(U_.mult), arc = ch * 3.6, ok = Math.random() * 100 < ch;
+  const target = ok ? arc * (.06 + Math.random() * .88) : arc + (360 - arc) * (.06 + Math.random() * .88);
+  const from = U_.rot, cur = from % 360;
+  const to = from + 360 * 6 + ((target - cur) + 360) % 360;
+  U_.busy = true; U_.rot = to; $('upGo').disabled = true;
+  $('upStatus').textContent = 'Крутим...'; ui();
+  const dur = 5200, t0 = performance.now(); let lastTick = from;
+  const frame = now => {
+    const p = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - p, 4), deg = from + (to - from) * e;
+    $('upPtr').setAttribute('transform', `rotate(${deg} 100 100)`);
+    if (deg - lastTick >= 15) { sound.tick(); lastTick = deg; }
+    if (p < 1) return requestAnimationFrame(frame);
+    U_.busy = false; $('upGo').disabled = false;
+    const win = Math.round(U_.amt * U_.mult), unit = U_.cur === 'coins' ? 'LOGO' : 'звёзд';
+    if (ok) {
+      if (U_.cur === 'coins') {
+        S.coins += win;
+        save();
+      } else {
+        S.stars += win;
+        save(win);
+      }
+      ui(); sound.win(); $('upStatus').innerHTML = `<b style="color:var(--ok)">Успех! +${win} ${unit}</b>`;
+      showResult(ic('check', 'star'), 'Апгрейд удался', `Ставка ${U_.amt} превратилась в ${win} ${unit}.`);
+    } else {
+      sound.boom(); $('upStatus').innerHTML = `<b style="color:var(--bad)">Не повезло</b>`;
+      showResult(ic('close'), 'Апгрейд не удался', `Ставка ${U_.amt} ${unit} сгорела. Попробуй ещё раз.`);
+    }
+  };
+  requestAnimationFrame(frame);
+}
+
+/* ===================== ИГРА: ДРОВОСЕК ===================== */
+const C = { ang: 0, raf: 0, last: 0, hp: 100, lvl: 1, combo: 1 };
+function chopStart() { chopStop(); C.last = performance.now(); const f = n => { C.ang = (C.ang + (n - C.last) * (0.28 + C.lvl * 0.06)) % 360; C.last = n; $('chNeedle').setAttribute('transform', `rotate(${C.ang} 100 100)`); C.raf = requestAnimationFrame(f); }; C.raf = requestAnimationFrame(f); }
+function chopStop() { cancelAnimationFrame(C.raf); }
+function chopHit() {
+  sound.tick();
+  const tr = $('chTree'); tr.classList.remove('spark'); void tr.getBoundingClientRect(); tr.classList.add('spark');
+  const diff = Math.min(C.ang, 360 - C.ang), st = $('chStatus');
+  if (diff <= 20) {
+    C.combo = Math.min(C.combo + 1, 9); C.hp -= 30;
+    const r = 5 * C.lvl * Math.min(C.combo, 5); S.coins += r; save(); ui(); sound.win();
+    if (C.hp <= 0) { C.lvl = Math.min(6, C.lvl + 1); C.hp = 100; $('chLvl').textContent = C.lvl; $('chRew').textContent = 5 * C.lvl; st.innerHTML = `<span style="color:var(--ice)">Дерево срублено! Уровень ${C.lvl}</span>`; }
+    else st.innerHTML = `<span style="color:var(--ok)">Точно! +${r} LOGO</span>`;
+  } else { C.combo = 1; st.innerHTML = `<span style="color:var(--bad)">Промах, комбо сброшено</span>`; }
+  $('chCombo').textContent = C.combo; $('chHp').style.width = Math.max(0, C.hp) + '%';
+}
+
+/* ===================== СТАРТ ===================== */
+ui(); nav('games');
+loadUserFromServer();
+
+</script>
+</body>
+</html>

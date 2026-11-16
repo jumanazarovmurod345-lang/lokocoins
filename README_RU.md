@@ -1,4 +1,4 @@
-# 🪙 LOGO COINS — Telegram Mini App (All-in-One)
+# LOGO COINS — учебный Telegram Mini App (демо)
 
 Готовый игровой Telegram Mini App проект в удобной монолитной структуре (как в ShiftStore):
 - **Flask** сервер, отдающий веб-приложение `web/index.html`.
@@ -14,8 +14,8 @@ pip install -r requirements.txt
 ### 2. Настройте файл `.env`:
 Откройте файл `.env` в Блокноте и вставьте данные:
 ```ini
-BOT_TOKEN=8893154925:AAGfHqwk8LZPsFD2HrdatrIcXkMhRGWKb0o
-OWNER_ID=7206933215
+BOT_TOKEN=токен_от_BotFather
+OWNER_ID=ваш_telegram_id
 BOT_USERNAME=ваш_юзернейм_бота
 WEBAPP_URL=https://ваша-ссылка-на-приложение
 PORT=10000
@@ -29,3 +29,12 @@ python bot.py
 ### 4. Деплой (Render / Railway / VPS):
 В проекте есть `Procfile` (`web: python bot.py`), поэтому он готов к мгновенному деплою на любой хостинг (Render.com, Railway.app, Heroku, Amvera).
 В настройках хостинга укажите переменные из `.env`.
+
+
+## Что внутри
+- Игры: Дровосек (бесплатный заработок LOGO), Апгрейд, Ракета.
+- Кейсы только за звёзды + ежедневный бесплатный.
+- Ранги растут от суммы пополнений.
+- Пополнение (звёзды, NFT-подарки, Visa, Uzcard) — **демо-симуляция**, реальные платежи не проводятся, данные карт не вводятся.
+- Баланс у каждого пользователя стартует с 0 и хранится в localStorage.
+- Поддержка: @merertd
