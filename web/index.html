@@ -3,36 +3,49 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>LOGO COINS | RubUP Edition</title>
+<title>LokoCoins — Премиальный игровой портал</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
   :root {
-    --bg: #0d111d;
-    --bg-darker: #080a12;
-    --card: #151b2d;
-    --card-hover: #1c243c;
-    --card-border: #232c48;
-    --card-inner: #101524;
-    --accent-purple: #7952f5;
-    --accent-blue: #3b82f6;
-    --accent-cyan: #06b6d4;
-    --gradient-purple: linear-gradient(135deg, #7952f5, #9333ea);
-    --gradient-btn: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #d946ef 100%);
-    --gradient-card: linear-gradient(180deg, rgba(29, 37, 60, 0.7) 0%, rgba(17, 23, 38, 0.95) 100%);
-    --text-main: #f8fafc;
-    --text-muted: #94a3b8;
-    --text-dim: #64748b;
+    --bg: #09090c;
+    --bg-surface: #111117;
+    --card: #15151e;
+    --card-hover: #1c1c28;
+    --card-border: rgba(255, 170, 0, 0.16);
+    --card-inner: #0d0d13;
+    
+    /* New Palette: Yellow, Orange, Red, White */
+    --accent-yellow: #ffcc00;
+    --accent-orange: #ff7700;
+    --accent-red: #ff3333;
+    --accent-violet: #8b5cf6; /* for Upgrade win zone */
+    --text-white: #ffffff;
+    --text-main: #f5f5f7;
+    --text-muted: #a1a1aa;
+    --text-dim: #71717a;
+
+    --gradient-flame: linear-gradient(135deg, #ffcc00 0%, #ff7700 50%, #ff3333 100%);
+    --gradient-gold: linear-gradient(135deg, #ffe066 0%, #f59e0b 100%);
+    --gradient-btn: linear-gradient(135deg, #ff9900 0%, #e11d48 100%);
+    --gradient-card: linear-gradient(180deg, rgba(28, 28, 38, 0.8) 0%, rgba(15, 15, 22, 0.95) 100%);
+    
+    --glow-gold: 0 8px 30px rgba(255, 204, 0, 0.25);
+    --glow-flame: 0 10px 32px rgba(255, 119, 0, 0.35);
+    --glow-red: 0 8px 24px rgba(255, 51, 51, 0.3);
+    
     --success: #10b981;
     --warning: #f59e0b;
     --danger: #ef4444;
-    --star: #38bdf8;
-    --coin: #fbbf24;
-    --glow-purple: 0 8px 32px rgba(121, 82, 245, 0.25);
-    --glow-blue: 0 8px 24px rgba(59, 130, 246, 0.25);
   }
 
-  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; margin: 0; padding: 0; }
-  
+  * {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+    outline: none;
+    margin: 0;
+    padding: 0;
+  }
+
   body {
     background-color: var(--bg);
     color: var(--text-main);
@@ -42,44 +55,38 @@
     min-height: 100dvh;
     overflow-x: hidden;
     position: relative;
+    padding-bottom: 90px;
   }
 
+  /* Atmospheric Flame Glow */
   body::before {
     content: '';
     position: fixed;
-    top: 0; left: 50%;
+    top: -120px;
+    left: 50%;
     transform: translateX(-50%);
-    width: 100vw;
+    width: 380px;
     height: 380px;
-    background: radial-gradient(ellipse at 50% 0%, rgba(99, 102, 241, 0.22) 0%, rgba(13, 17, 29, 0) 70%);
+    background: radial-gradient(circle, rgba(255, 119, 0, 0.18) 0%, rgba(255, 51, 51, 0.08) 50%, transparent 75%);
     pointer-events: none;
     z-index: 0;
   }
 
-  #app {
-    max-width: 460px;
+  /* App Container */
+  .app-container {
+    max-width: 480px;
     margin: 0 auto;
-    min-height: 100dvh;
-    display: flex;
-    flex-direction: column;
     position: relative;
     z-index: 1;
-    padding-bottom: 95px;
+    padding: 12px 16px 20px 16px;
   }
 
-  /* ── HEADER ── */
-  header.top-bar {
-    position: sticky;
-    top: 0;
-    z-index: 50;
+  /* ── TOP HEADER ── */
+  .top-bar {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 12px 16px;
-    background: rgba(13, 17, 29, 0.88);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    padding: 8px 0 14px 0;
   }
 
   .brand {
@@ -88,18 +95,28 @@
     gap: 8px;
     cursor: pointer;
   }
-  .brand-logo {
+
+  .brand-logo-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    background: var(--gradient-flame);
     display: flex;
     align-items: center;
-    font-size: 22px;
+    justify-content: center;
+    box-shadow: var(--glow-gold);
+    font-size: 18px;
+  }
+
+  .brand-title {
+    font-size: 20px;
     font-weight: 900;
     letter-spacing: -0.5px;
-    background: linear-gradient(135deg, #fff 40%, #a5b4fc 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    color: var(--text-white);
   }
-  .brand-logo span {
-    background: linear-gradient(135deg, #ec4899, #f59e0b);
+
+  .brand-title span {
+    background: var(--gradient-flame);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
   }
@@ -114,161 +131,113 @@
     display: flex;
     align-items: center;
     gap: 6px;
-    background: #182033;
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--card-border);
     border-radius: 20px;
-    padding: 5px 12px;
-    font-size: 14px;
-    font-weight: 800;
-    color: #fff;
-    box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
-    cursor: pointer;
-    transition: 0.2s;
-  }
-  .balance-pill:hover { border-color: rgba(255,255,255,0.2); }
-  .balance-pill .gem-icon {
-    width: 17px; height: 17px; fill: var(--star);
-  }
-
-  .btn-topup-nav {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: var(--gradient-purple);
-    color: #fff;
-    border: none;
-    padding: 7px 14px;
-    border-radius: 18px;
+    padding: 6px 12px;
     font-size: 13px;
-    font-weight: 800;
+    font-weight: 700;
     cursor: pointer;
-    box-shadow: 0 4px 14px rgba(121, 82, 245, 0.4);
-    transition: transform 0.15s, box-shadow 0.15s;
+    transition: all 0.2s;
   }
-  .btn-topup-nav:active { transform: scale(0.96); }
 
-  .user-avatar-badge {
-    width: 32px; height: 32px;
+  .balance-pill:active {
+    transform: scale(0.96);
+    background: rgba(255, 170, 0, 0.12);
+  }
+
+  .balance-pill.stars {
+    color: var(--accent-yellow);
+    box-shadow: 0 2px 10px rgba(255, 204, 0, 0.12);
+  }
+
+  .balance-pill.coins {
+    color: var(--accent-orange);
+  }
+
+  .topup-plus-btn {
+    width: 20px;
+    height: 20px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #ec4899, #8b5cf6);
+    background: var(--gradient-flame);
+    color: #000;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: 800;
-    font-size: 12px;
-    color: #fff;
-    cursor: pointer;
-    border: 2px solid #232c48;
+    font-size: 14px;
+    font-weight: 900;
+    margin-left: 2px;
   }
 
-  /* ── BANNER SLIDER ── */
-  .banner-slider {
-    padding: 12px 16px 6px;
-  }
-  .promo-banner {
-    position: relative;
-    border-radius: 24px;
-    overflow: hidden;
-    background: linear-gradient(135deg, #2a1b54 0%, #171836 50%, #0f172a 100%);
-    border: 1px solid rgba(139, 92, 246, 0.3);
-    box-shadow: var(--glow-purple);
-    padding: 20px;
-    min-height: 145px;
+  /* ── BANNER / STATUS CARD ── */
+  .status-banner {
+    background: var(--gradient-card);
+    border: 1px solid var(--card-border);
+    border-radius: 18px;
+    padding: 14px 16px;
     display: flex;
-    flex-direction: column;
-    justify-content: center;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 18px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    position: relative;
+    overflow: hidden;
   }
-  .promo-banner .banner-art {
+
+  .status-banner::before {
+    content: '';
     position: absolute;
-    right: 6px;
-    bottom: 0;
+    top: 0;
+    right: 0;
     width: 140px;
-    height: 135px;
+    height: 100%;
+    background: radial-gradient(circle, rgba(255, 119, 0, 0.18) 0%, transparent 70%);
     pointer-events: none;
-    filter: drop-shadow(0 10px 18px rgba(0,0,0,0.5));
   }
-  .promo-banner h2 {
-    font-size: 20px;
-    font-weight: 900;
-    line-height: 1.1;
+
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background: rgba(255, 170, 0, 0.15);
+    color: var(--accent-yellow);
+    border: 1px solid rgba(255, 204, 0, 0.3);
     margin-bottom: 4px;
-    color: #fff;
-    text-shadow: 0 2px 6px rgba(0,0,0,0.5);
   }
-  .promo-banner p {
+
+  .status-info h4 {
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--text-white);
+  }
+
+  .status-info p {
     font-size: 12px;
-    color: #cbd5e1;
-    margin-bottom: 12px;
+    color: var(--text-muted);
+    margin-top: 2px;
   }
-  .promo-banner .btn-banner {
-    align-self: flex-start;
+
+  .status-btn-small {
     background: var(--gradient-btn);
     color: #fff;
     border: none;
-    padding: 8px 18px;
-    border-radius: 14px;
+    border-radius: 12px;
+    padding: 8px 14px;
     font-size: 12px;
     font-weight: 800;
     cursor: pointer;
-    box-shadow: 0 4px 15px rgba(217, 70, 239, 0.35);
+    box-shadow: var(--glow-flame);
+    transition: transform 0.15s;
   }
 
-  /* ── LIVE FEED ── */
-  .live-strip {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 16px;
-    overflow-x: auto;
-    scrollbar-width: none;
-  }
-  .live-strip::-webkit-scrollbar { display: none; }
-  .live-tag {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    font-size: 10px;
-    font-weight: 900;
-    color: var(--text-dim);
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-    flex-shrink: 0;
-  }
-  .live-tag::before {
-    content: '';
-    width: 6px; height: 6px;
-    background: var(--success);
-    border-radius: 50%;
-    box-shadow: 0 0 8px var(--success);
-    animation: pulse 1.5s infinite;
-  }
-  @keyframes pulse { 0%{opacity:0.6} 50%{opacity:1} 100%{opacity:0.6} }
-  .live-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: #151b2d;
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    border-radius: 14px;
-    padding: 4px 10px 4px 6px;
-    flex-shrink: 0;
-    font-size: 12px;
-    font-weight: 700;
-  }
-  .live-thumb {
-    width: 24px; height: 24px;
-    border-radius: 6px;
-    background: #232c48;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-  }
-  .live-win {
-    color: #38bdf8;
-    display: flex;
-    align-items: center;
-    gap: 3px;
+  .status-btn-small:active {
+    transform: scale(0.95);
   }
 
   /* ── SECTION HEADINGS ── */
@@ -276,1861 +245,2343 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 14px 16px 8px;
+    margin: 18px 0 12px 0;
   }
-  .section-head h2 {
-    font-size: 19px;
-    font-weight: 900;
-    color: #fff;
-    letter-spacing: -0.3px;
-  }
-  .section-head .see-all {
-    font-size: 12px;
-    color: var(--text-muted);
-    font-weight: 700;
-    cursor: pointer;
-    text-decoration: none;
+
+  .section-head h3 {
+    font-size: 17px;
+    font-weight: 800;
+    color: var(--text-white);
     display: flex;
     align-items: center;
-    gap: 2px;
+    gap: 6px;
   }
 
-  /* ── GRIDS ── */
-  .grid-2 {
+  /* ── GAME TABS & CARDS ── */
+  .game-selector {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-    padding: 0 16px 16px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 14px;
   }
 
-  /* ── GAME CARDS (RubUP Style) ── */
-  .game-card {
-    position: relative;
-    background: var(--gradient-card);
+  .game-sel-btn {
+    background: var(--card);
     border: 1px solid var(--card-border);
-    border-radius: 22px;
-    overflow: hidden;
-    cursor: pointer;
-    transition: transform 0.18s, border-color 0.18s, box-shadow 0.18s;
+    border-radius: 14px;
+    padding: 10px 6px;
     display: flex;
     flex-direction: column;
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
-  }
-  .game-card:hover {
-    transform: translateY(-2px);
-    border-color: rgba(139, 92, 246, 0.4);
-    box-shadow: 0 10px 28px rgba(121, 82, 245, 0.2);
-  }
-  .game-card:active { transform: scale(0.97); }
-
-  .game-cover {
-    width: 100%;
-    aspect-ratio: 1 / 1.05;
-    position: relative;
-    overflow: hidden;
-    display: flex;
     align-items: center;
-    justify-content: center;
+    gap: 4px;
+    color: var(--text-muted);
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
   }
-  .game-cover svg {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+
+  .game-sel-btn.active {
+    background: rgba(255, 119, 0, 0.14);
+    border-color: var(--accent-orange);
+    color: var(--text-white);
+    box-shadow: 0 4px 16px rgba(255, 119, 0, 0.2);
+  }
+
+  .game-sel-btn span.emoji {
+    font-size: 22px;
+  }
+
+  /* Game Containers */
+  .game-view {
+    display: none;
+    animation: fadeIn 0.25s ease-out;
+  }
+
+  .game-view.active {
     display: block;
   }
 
-  .online-badge {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    background: rgba(13, 17, 29, 0.75);
-    backdrop-filter: blur(8px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 12px;
-    padding: 3px 8px;
-    font-size: 10px;
-    font-weight: 800;
-    color: #e2e8f0;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    z-index: 2;
-  }
-  .online-badge::before {
-    content: '';
-    width: 5px; height: 5px;
-    border-radius: 50%;
-    background: var(--success);
-    box-shadow: 0 0 6px var(--success);
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 
-  .tag-badge {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background: rgba(121, 82, 245, 0.85);
-    border-radius: 10px;
-    padding: 3px 7px;
-    font-size: 10px;
-    font-weight: 800;
-    color: #fff;
-    z-index: 2;
-  }
-
-  .game-footer {
-    padding: 10px 14px 14px;
-    background: rgba(13, 17, 29, 0.85);
-    border-top: 1px solid rgba(255, 255, 255, 0.04);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  .game-title {
-    font-size: 15px;
-    font-weight: 900;
-    color: #fff;
-    letter-spacing: -0.2px;
-  }
-  .game-action-btn {
-    width: 28px; height: 28px;
-    border-radius: 50%;
-    background: var(--gradient-purple);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #fff;
-    box-shadow: 0 2px 8px rgba(121, 82, 245, 0.5);
-  }
-
-  /* ── CASE CARDS (RubUP Style) ── */
-  .case-card {
-    position: relative;
+  /* ── COMMON GAME STYLES ── */
+  .game-card {
     background: var(--gradient-card);
     border: 1px solid var(--card-border);
-    border-radius: 22px;
-    overflow: hidden;
-    cursor: pointer;
-    transition: transform 0.18s, border-color 0.18s;
-    display: flex;
-    flex-direction: column;
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+    border-radius: 20px;
+    padding: 18px 16px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
   }
-  .case-card:hover {
-    transform: translateY(-2px);
-    border-color: rgba(56, 189, 248, 0.4);
-  }
-  .case-card:active { transform: scale(0.97); }
 
-  .case-art-box {
+  .control-group {
+    margin-top: 14px;
+  }
+
+  .control-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+
+  .bet-input-wrap {
+    display: flex;
+    align-items: center;
+    background: var(--card-inner);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    padding: 4px 8px;
+  }
+
+  .bet-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: var(--text-white);
+    font-size: 18px;
+    font-weight: 800;
+    padding: 8px 6px;
     width: 100%;
-    aspect-ratio: 1 / 1;
-    position: relative;
+  }
+
+  .currency-toggle {
+    display: flex;
+    gap: 4px;
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 10px;
+    padding: 2px;
+  }
+
+  .currency-btn {
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 12px;
+    font-weight: 800;
+    padding: 4px 8px;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+
+  .currency-btn.active {
+    background: var(--gradient-flame);
+    color: #000;
+  }
+
+  .chip-row {
+    display: flex;
+    gap: 6px;
+    margin-top: 8px;
+  }
+
+  .chip-btn {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: var(--text-muted);
+    font-size: 12px;
+    font-weight: 700;
+    padding: 6px 0;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .chip-btn:active {
+    background: rgba(255, 119, 0, 0.2);
+    border-color: var(--accent-orange);
+    color: #fff;
+  }
+
+  .main-action-btn {
+    width: 100%;
+    margin-top: 16px;
+    background: var(--gradient-btn);
+    color: #fff;
+    border: none;
+    border-radius: 16px;
+    padding: 14px;
+    font-size: 16px;
+    font-weight: 900;
+    letter-spacing: 0.3px;
+    cursor: pointer;
+    box-shadow: var(--glow-flame);
+    transition: transform 0.15s, opacity 0.15s;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 10px;
-  }
-  .case-art-box svg {
-    width: 100%; height: 100%;
-    filter: drop-shadow(0 10px 16px rgba(0,0,0,0.6));
+    gap: 8px;
   }
 
-  .badge-new {
+  .main-action-btn:active {
+    transform: scale(0.97);
+  }
+
+  .main-action-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  /* ── GAME 1: UPGRADE (КОЛЕСО) ── */
+  .upgrade-wheel-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 0 18px 0;
+    position: relative;
+  }
+
+  .wheel-box {
+    position: relative;
+    width: 220px;
+    height: 220px;
+  }
+
+  .wheel-arrow {
     position: absolute;
-    top: 10px; left: 10px;
-    background: linear-gradient(135deg, #ec4899, #f43f5e);
-    color: #fff;
-    font-size: 9px;
-    font-weight: 900;
-    text-transform: uppercase;
-    padding: 3px 8px;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(236, 72, 153, 0.4);
-    z-index: 2;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-top: 18px solid var(--accent-yellow);
+    z-index: 10;
+    filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.8));
   }
 
-  .case-meta {
-    padding: 10px 12px 14px;
-    background: rgba(13, 17, 29, 0.85);
-    border-top: 1px solid rgba(255, 255, 255, 0.04);
+  #wheelCanvas {
+    width: 220px;
+    height: 220px;
+    border-radius: 50%;
+    box-shadow: 0 0 25px rgba(255, 119, 0, 0.2);
+    transition: transform 4s cubic-bezier(0.12, 0.8, 0.2, 1);
+  }
+
+  .wheel-center-badge {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: var(--card-inner);
+    border: 2px solid var(--accent-orange);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 900;
+    color: var(--text-white);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.8);
+    pointer-events: none;
+  }
+
+  .multiplier-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 4px;
+    margin-top: 8px;
+  }
+
+  .multi-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    padding: 8px 0;
+    color: var(--text-muted);
+    font-size: 12px;
+    font-weight: 800;
+    cursor: pointer;
+  }
+
+  .multi-btn.active {
+    background: var(--accent-violet);
+    border-color: #a78bfa;
+    color: #fff;
+    box-shadow: 0 0 12px rgba(139, 92, 246, 0.4);
+  }
+
+  /* ── GAME 2: ROCKET CRASH ── */
+  .crash-screen {
+    width: 100%;
+    height: 220px;
+    background: radial-gradient(circle at 50% 100%, #1a1024 0%, #0d0d14 70%);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 119, 0, 0.15);
+    position: relative;
+    overflow: hidden;
+  }
+
+  #crashCanvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  .crash-mult-hud {
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    pointer-events: none;
+  }
+
+  .crash-mult-val {
+    font-size: 38px;
+    font-weight: 900;
+    color: var(--text-white);
+    text-shadow: 0 0 20px rgba(255, 170, 0, 0.6);
+    letter-spacing: -1px;
+  }
+
+  .crash-status-text {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--accent-yellow);
+    margin-top: 2px;
+  }
+
+  .crash-cashout-btn {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    box-shadow: 0 8px 24px rgba(16, 185, 129, 0.4);
+  }
+
+  /* ── GAME 3: TAP GAME (ТАПАЛКА) ── */
+  .tap-area-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px 0;
+    position: relative;
+  }
+
+  .tap-score-counter {
+    text-align: center;
+    margin-bottom: 12px;
+  }
+
+  .tap-score-num {
+    font-size: 42px;
+    font-weight: 900;
+    background: var(--gradient-flame);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -1px;
+  }
+
+  .tap-score-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .tap-coin-btn {
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #ffe680 0%, #f59e0b 45%, #b45309 85%);
+    border: 6px solid #fef08a;
+    box-shadow: 0 0 40px rgba(245, 158, 11, 0.4), inset 0 0 20px rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: relative;
+    user-select: none;
+    transition: transform 0.08s ease;
+  }
+
+  .tap-coin-btn:active {
+    transform: scale(0.92) rotate(2deg);
+  }
+
+  .tap-coin-inner {
+    font-size: 70px;
+    filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.5));
+  }
+
+  .tap-floating-number {
+    position: absolute;
+    color: var(--accent-yellow);
+    font-size: 24px;
+    font-weight: 900;
+    pointer-events: none;
+    animation: floatUp 0.8s ease-out forwards;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+  }
+
+  @keyframes floatUp {
+    0% { opacity: 1; transform: translateY(0) scale(1); }
+    100% { opacity: 0; transform: translateY(-70px) scale(1.4); }
+  }
+
+  /* Leaderboard in Tap Game */
+  .leaderboard-card {
+    background: var(--card-inner);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 16px;
+    padding: 12px;
+    margin-top: 14px;
+  }
+
+  .leaderboard-title {
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--text-white);
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 4px;
+    margin-bottom: 8px;
   }
-  .case-name {
+
+  .leader-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 6px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
     font-size: 13px;
-    font-weight: 800;
-    color: #fff;
+  }
+
+  .leader-row:last-child {
+    border-bottom: none;
+  }
+
+  .leader-rank {
+    width: 22px;
+    font-weight: 900;
+    color: var(--accent-yellow);
+  }
+
+  .leader-name {
+    flex: 1;
+    font-weight: 700;
+    color: var(--text-white);
+    margin: 0 8px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
-  .case-price-pill {
-    background: #6366f1;
-    color: #fff;
-    border-radius: 12px;
-    padding: 4px 9px;
-    font-size: 12px;
-    font-weight: 900;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    flex-shrink: 0;
-    box-shadow: 0 3px 10px rgba(99, 102, 241, 0.4);
+
+  .leader-score {
+    font-weight: 800;
+    color: var(--accent-orange);
   }
 
-  /* ── TABS FOR CASES / GAMES ── */
-  .category-chips {
-    display: flex;
-    gap: 6px;
-    padding: 6px 16px 14px;
-    overflow-x: auto;
-    scrollbar-width: none;
+  .leader-reward {
+    font-size: 11px;
+    font-weight: 800;
+    background: rgba(255, 204, 0, 0.15);
+    color: var(--accent-yellow);
+    padding: 2px 6px;
+    border-radius: 6px;
+    margin-left: 6px;
   }
-  .category-chips::-webkit-scrollbar { display: none; }
-  .cat-chip {
-    background: #182033;
+
+  /* ── SECTION: CASES (КЕЙСЫ) ── */
+  .cases-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .case-item-card {
+    background: var(--gradient-card);
+    border: 1px solid var(--card-border);
+    border-radius: 18px;
+    padding: 16px 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.2s;
+    cursor: pointer;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.4);
+  }
+
+  .case-item-card:active {
+    transform: scale(0.97);
+    border-color: var(--accent-orange);
+  }
+
+  .case-item-card.has-nft {
+    border-color: rgba(255, 204, 0, 0.4);
+    box-shadow: 0 0 20px rgba(255, 204, 0, 0.15);
+  }
+
+  .case-badge-nft {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: var(--gradient-flame);
+    color: #000;
+    font-size: 9px;
+    font-weight: 900;
+    padding: 3px 6px;
+    border-radius: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .case-icon-box {
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 46px;
+    margin: 8px 0;
+    filter: drop-shadow(0 6px 14px rgba(255, 119, 0, 0.3));
+    transition: transform 0.3s;
+  }
+
+  .case-item-card:hover .case-icon-box {
+    transform: scale(1.08);
+  }
+
+  .case-name {
+    font-size: 14px;
+    font-weight: 800;
+    color: var(--text-white);
+  }
+
+  .case-desc {
+    font-size: 11px;
     color: var(--text-muted);
+    margin: 4px 0 10px 0;
+    line-height: 1.3;
+    min-height: 28px;
+  }
+
+  .case-open-btn {
+    width: 100%;
+    background: var(--gradient-btn);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: 9px 0;
+    font-size: 13px;
+    font-weight: 900;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    box-shadow: var(--glow-flame);
+  }
+
+  /* ── SECTION: PROFILE (ПРОФИЛЬ) ── */
+  .profile-card {
+    background: var(--gradient-card);
+    border: 1px solid var(--card-border);
+    border-radius: 20px;
+    padding: 18px 16px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+    margin-bottom: 14px;
+  }
+
+  .profile-user-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .user-avatar {
+    width: 52px;
+    height: 52px;
+    border-radius: 16px;
+    background: var(--gradient-flame);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    color: #000;
+    font-weight: 900;
+    box-shadow: var(--glow-gold);
+  }
+
+  .user-meta h3 {
+    font-size: 17px;
+    font-weight: 900;
+    color: var(--text-white);
+  }
+
+  .user-meta p {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  /* Status Tier Progress Bar */
+  .tier-progress-box {
+    background: var(--card-inner);
     border: 1px solid rgba(255, 255, 255, 0.06);
     border-radius: 14px;
-    padding: 7px 14px;
+    padding: 12px;
+    margin-bottom: 14px;
+  }
+
+  .tier-label-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+  }
+
+  .tier-current-name {
+    color: var(--accent-yellow);
+    font-weight: 800;
+  }
+
+  .progress-track {
+    width: 100%;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: var(--gradient-flame);
+    border-radius: 6px;
+    transition: width 0.4s ease;
+  }
+
+  .status-benefits-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+    margin-top: 8px;
+  }
+
+  .benefit-mini {
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 8px;
+    padding: 6px 8px;
+    font-size: 10px;
+    color: var(--text-muted);
+    line-height: 1.3;
+  }
+
+  .benefit-mini b {
+    color: var(--text-white);
+    display: block;
+    margin-bottom: 2px;
+  }
+
+  /* Referral Card */
+  .ref-box {
+    background: var(--card-inner);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 14px;
+    padding: 12px;
+    margin-top: 14px;
+  }
+
+  .ref-link-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+  }
+
+  .ref-input {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    color: var(--text-muted);
+    font-size: 12px;
+    padding: 8px;
+  }
+
+  .copy-btn {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    color: var(--text-white);
+    border-radius: 10px;
+    padding: 0 14px;
     font-size: 12px;
     font-weight: 800;
     cursor: pointer;
-    white-space: nowrap;
-    transition: 0.15s;
-  }
-  .cat-chip.active {
-    background: var(--gradient-purple);
-    color: #fff;
-    border-color: transparent;
-    box-shadow: 0 4px 12px rgba(121, 82, 245, 0.35);
   }
 
-  /* ── BOTTOM NAVIGATION (Exact RubUP) ── */
+  /* Promo Box */
+  .promo-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+  }
+
+  .promo-input {
+    flex: 1;
+    background: var(--card-inner);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    color: var(--text-white);
+    font-size: 14px;
+    font-weight: 800;
+    padding: 10px 12px;
+    text-transform: uppercase;
+  }
+
+  .promo-btn {
+    background: var(--gradient-btn);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: 0 18px;
+    font-size: 13px;
+    font-weight: 800;
+    cursor: pointer;
+  }
+
+  /* Inventory Grid */
+  .inventory-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  .inv-item-card {
+    background: var(--card-inner);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    padding: 10px 6px;
+    text-align: center;
+    position: relative;
+  }
+
+  .inv-item-card.is-nft {
+    border-color: var(--accent-yellow);
+    box-shadow: 0 0 12px rgba(255, 204, 0, 0.25);
+  }
+
+  .inv-item-nft-tag {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    background: var(--gradient-flame);
+    color: #000;
+    font-size: 8px;
+    font-weight: 900;
+    padding: 1px 4px;
+    border-radius: 4px;
+  }
+
+  .inv-item-icon {
+    font-size: 28px;
+    margin: 4px 0;
+  }
+
+  .inv-item-name {
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--text-white);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .inv-item-rarity {
+    font-size: 10px;
+    color: var(--text-muted);
+  }
+
+  /* ── SECTION: TOP-UP (ПОПОЛНЕНИЕ) ── */
+  .topup-method-toggle {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+
+  .method-tab-btn {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: 14px;
+    padding: 12px 8px;
+    color: var(--text-muted);
+    font-size: 13px;
+    font-weight: 800;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s;
+  }
+
+  .method-tab-btn.active {
+    background: rgba(255, 119, 0, 0.16);
+    border-color: var(--accent-orange);
+    color: var(--text-white);
+    box-shadow: 0 4px 16px rgba(255, 119, 0, 0.25);
+  }
+
+  .topup-pane {
+    display: none;
+  }
+
+  .topup-pane.active {
+    display: block;
+  }
+
+  .card-details-box {
+    background: linear-gradient(135deg, #1f1f2e 0%, #12121c 100%);
+    border: 1px solid rgba(255, 204, 0, 0.25);
+    border-radius: 16px;
+    padding: 14px;
+    margin-bottom: 14px;
+    position: relative;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+  }
+
+  .card-num-text {
+    font-size: 19px;
+    font-weight: 900;
+    letter-spacing: 1.5px;
+    color: var(--accent-yellow);
+    margin: 8px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .copy-card-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: #fff;
+    border-radius: 8px;
+    padding: 4px 10px;
+    font-size: 11px;
+    font-weight: 800;
+    cursor: pointer;
+  }
+
+  .receipt-dropzone {
+    border: 2px dashed rgba(255, 170, 0, 0.3);
+    border-radius: 14px;
+    padding: 18px;
+    text-align: center;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.02);
+    margin-top: 10px;
+    transition: all 0.2s;
+  }
+
+  .receipt-dropzone:active {
+    background: rgba(255, 119, 0, 0.08);
+    border-color: var(--accent-orange);
+  }
+
+  /* ── BOTTOM NAVIGATION (4 Вкладки) ── */
   nav.bottom-nav {
     position: fixed;
     bottom: 12px;
     left: 50%;
     transform: translateX(-50%);
     width: calc(100% - 24px);
-    max-width: 436px;
-    background: rgba(18, 23, 39, 0.92);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    max-width: 440px;
+    background: rgba(16, 16, 24, 0.94);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    border: 1px solid rgba(255, 170, 0, 0.2);
     border-radius: 26px;
     padding: 6px;
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 4px;
     z-index: 100;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.7);
   }
+
   .nav-btn {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 3px;
-    padding: 9px 0;
-    border-radius: 20px;
-    color: var(--text-dim);
+    gap: 4px;
+    padding: 8px 0;
+    border-radius: 18px;
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
     font-size: 11px;
     font-weight: 800;
-    border: none;
-    background: transparent;
     cursor: pointer;
     transition: all 0.2s;
   }
+
   .nav-btn svg {
-    width: 20px; height: 20px;
+    width: 22px;
+    height: 22px;
     stroke: currentColor;
+    stroke-width: 2.2;
     fill: none;
-    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
     transition: transform 0.2s;
   }
+
   .nav-btn.active {
-    background: #252e49;
-    color: #fff;
+    background: rgba(255, 119, 0, 0.18);
+    color: var(--accent-yellow);
   }
+
   .nav-btn.active svg {
-    transform: translateY(-1px);
-    stroke: var(--star);
+    stroke: var(--accent-yellow);
+    transform: translateY(-2px);
   }
 
-  /* ── SCREENS & MODALS ── */
-  .screen {
-    position: fixed;
-    inset: 0;
-    background: var(--bg);
-    z-index: 80;
-    overflow-y: auto;
-    max-width: 460px;
-    margin: 0 auto;
-    display: flex;
-    flex-direction: column;
-  }
-  .screen-header {
-    position: sticky;
-    top: 0;
-    background: rgba(13, 17, 29, 0.92);
-    backdrop-filter: blur(14px);
-    border-bottom: 1px solid var(--card-border);
-    padding: 14px 16px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    z-index: 10;
-  }
-  .screen-header h3 {
-    font-size: 17px;
-    font-weight: 900;
-  }
-  .btn-icon {
-    width: 36px; height: 36px;
-    border-radius: 12px;
-    background: #182033;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    color: #fff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-  }
-
+  /* ── MODALS (Case Opening Roulette, Toast) ── */
   .modal-overlay {
     position: fixed;
-    inset: 0;
-    background: rgba(4, 7, 15, 0.82);
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.85);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
+    z-index: 200;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 16px;
-    z-index: 110;
+    animation: fadeIn 0.2s ease-out;
   }
-  .modal-sheet {
-    background: #151b2d;
+
+  .modal-overlay.hidden {
+    display: none;
+  }
+
+  .modal-dialog {
+    background: var(--bg-surface);
     border: 1px solid var(--card-border);
-    border-radius: 28px;
+    border-radius: 24px;
     width: 100%;
-    max-width: 410px;
-    max-height: 90dvh;
-    overflow-y: auto;
-    padding: 22px;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.8);
-    position: relative;
-    animation: popIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-  @keyframes popIn {
-    from { opacity: 0; transform: scale(0.92) translateY(10px); }
-    to { opacity: 1; transform: scale(1) translateY(0); }
-  }
-
-  .hidden { display: none !important; }
-
-  /* ── FORMS & CARDS ── */
-  .card-box {
-    background: #182033;
-    border: 1px solid var(--card-border);
-    border-radius: 20px;
-    padding: 16px;
-    margin-bottom: 14px;
-  }
-  .field-label {
-    font-size: 11px;
-    font-weight: 800;
-    color: var(--text-dim);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 6px;
-  }
-  .input-text {
-    width: 100%;
-    background: #0f1423;
-    border: 1px solid var(--card-border);
-    border-radius: 14px;
-    padding: 12px 14px;
-    font-size: 15px;
-    font-weight: 800;
-    color: #fff;
-    transition: border-color 0.15s;
-  }
-  .input-text:focus {
-    border-color: var(--accent-purple);
-  }
-
-  .btn-action {
-    width: 100%;
-    background: var(--gradient-btn);
-    color: #fff;
-    border: none;
-    border-radius: 16px;
-    padding: 14px;
-    font-size: 14px;
-    font-weight: 900;
-    cursor: pointer;
-    box-shadow: var(--glow-purple);
-    transition: transform 0.15s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-  }
-  .btn-action:active { transform: scale(0.97); }
-  .btn-action:disabled { opacity: 0.5; cursor: not-allowed; }
-
-  .requisites-box {
-    background: linear-gradient(135deg, rgba(121, 82, 245, 0.15), rgba(59, 130, 246, 0.1));
-    border: 1px dashed rgba(121, 82, 245, 0.4);
-    border-radius: 16px;
-    padding: 14px;
-    margin: 12px 0;
-  }
-  .req-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    font-size: 13px;
-    margin-bottom: 6px;
-  }
-  .req-row:last-child { margin-bottom: 0; }
-  .req-val {
-    font-family: monospace;
-    font-size: 15px;
-    font-weight: 800;
-    color: #38bdf8;
-    background: #0f1423;
-    padding: 2px 8px;
-    border-radius: 6px;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    cursor: pointer;
-  }
-
-  .upload-area {
-    border: 2px dashed rgba(255, 255, 255, 0.15);
-    border-radius: 18px;
-    padding: 18px;
+    max-width: 400px;
+    padding: 20px 16px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
     text-align: center;
-    cursor: pointer;
-    background: #0f1423;
-    transition: border-color 0.2s, background 0.2s;
-    margin: 12px 0;
-  }
-  .upload-area:hover {
-    border-color: var(--accent-purple);
-    background: rgba(121, 82, 245, 0.05);
-  }
-  .upload-area svg {
-    width: 36px; height: 36px;
-    stroke: var(--accent-purple);
-    margin-bottom: 6px;
+    position: relative;
   }
 
-  /* ── STATUS BADGES ── */
-  .status-badge {
-    display: inline-block;
-    padding: 4px 10px;
-    border-radius: 10px;
-    font-size: 11px;
-    font-weight: 800;
-    text-transform: uppercase;
+  .roulette-container {
+    position: relative;
+    width: 100%;
+    height: 120px;
+    background: var(--card-inner);
+    border-radius: 14px;
+    overflow: hidden;
+    margin: 16px 0;
+    border: 2px solid var(--card-border);
   }
-  .status-pending { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); }
-  .status-approved { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); }
-  .status-rejected { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4); }
 
-  /* ── ADMIN PANEL ── */
-  .admin-req-card {
-    background: #182033;
-    border: 1px solid var(--card-border);
-    border-radius: 18px;
-    padding: 14px;
-    margin-bottom: 12px;
+  .roulette-pointer {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    width: 3px;
+    background: var(--accent-yellow);
+    box-shadow: 0 0 10px var(--accent-yellow);
+    transform: translateX(-50%);
+    z-index: 10;
   }
-  .admin-req-head {
+
+  .roulette-pointer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -5px;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 10px solid var(--accent-yellow);
+  }
+
+  .roulette-pointer::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: -5px;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-bottom: 10px solid var(--accent-yellow);
+  }
+
+  .roulette-reel {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 8px;
-    font-size: 12px;
-  }
-  .admin-btns {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-    margin-top: 10px;
-  }
-  .btn-approve {
-    background: #10b981;
-    color: #fff;
-    border: none;
-    padding: 9px;
-    border-radius: 12px;
-    font-weight: 900;
-    cursor: pointer;
-  }
-  .btn-reject {
-    background: #ef4444;
-    color: #fff;
-    border: none;
-    padding: 9px;
-    border-radius: 12px;
-    font-weight: 900;
-    cursor: pointer;
+    height: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
+    transition: transform 5s cubic-bezier(0.1, 0.85, 0.2, 1);
   }
 
-  /* ── TOAST ── */
+  .roulette-item {
+    width: 90px;
+    height: 100%;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-right: 1px solid rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.02);
+  }
+
+  .roulette-item.nft {
+    background: rgba(255, 204, 0, 0.12);
+    box-shadow: inset 0 0 15px rgba(255, 204, 0, 0.3);
+  }
+
+  .roulette-item-icon {
+    font-size: 38px;
+  }
+
+  .roulette-item-name {
+    font-size: 10px;
+    font-weight: 800;
+    color: var(--text-muted);
+    margin-top: 4px;
+    max-width: 80px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Toast Notification */
   .toast {
     position: fixed;
-    top: 65px; left: 50%;
+    top: 20px;
+    left: 50%;
     transform: translateX(-50%) translateY(-20px);
-    background: #fff;
-    color: #0f172a;
+    background: var(--card);
+    border: 1px solid var(--accent-orange);
+    color: #fff;
     padding: 10px 18px;
-    border-radius: 16px;
+    border-radius: 20px;
     font-size: 13px;
     font-weight: 800;
-    z-index: 200;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    box-shadow: var(--glow-flame);
+    z-index: 300;
     opacity: 0;
     pointer-events: none;
-    transition: 0.25s;
-    text-align: center;
-    max-width: 90%;
+    transition: all 0.25s ease;
   }
+
   .toast.show {
     opacity: 1;
     transform: translateX(-50%) translateY(0);
-  }
-
-  /* ── GAME PLAY SCREENS ── */
-  .game-container {
-    padding: 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-  }
-  .game-display-card {
-    background: #151b2d;
-    border: 1px solid var(--card-border);
-    border-radius: 24px;
-    overflow: hidden;
-    position: relative;
-    padding: 16px;
-    text-align: center;
-  }
-  .rocket-sky {
-    height: 190px;
-    border-radius: 20px;
-    background: linear-gradient(180deg, #1e1b4b 0%, #090d16 100%);
-    position: relative;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid rgba(255,255,255,0.05);
-  }
-  .mult-text {
-    position: absolute;
-    top: 16px;
-    font-size: 40px;
-    font-weight: 900;
-    color: #fff;
-    text-shadow: 0 0 20px rgba(99, 102, 241, 0.8);
-  }
-  .rocket-sprite {
-    position: absolute;
-    bottom: 25px;
-    width: 65px; height: 65px;
-    transition: bottom 0.08s linear;
-  }
-
-  /* Roulette for Cases */
-  .roulette-box {
-    position: relative;
-    height: 120px;
-    border-radius: 20px;
-    background: #0f1423;
-    border: 2px solid var(--accent-purple);
-    overflow: hidden;
-    margin: 14px 0;
-  }
-  .roulette-pointer {
-    position: absolute;
-    top: 0; bottom: 0; left: 50%;
-    width: 4px;
-    transform: translateX(-50%);
-    background: #fff;
-    z-index: 10;
-    box-shadow: 0 0 12px #fff;
-  }
-  .roulette-track {
-    display: flex;
-    align-items: center;
-    height: 100%;
-    will-change: transform;
-  }
-  .roulette-item {
-    width: 90px; height: 96px;
-    margin-right: 8px;
-    flex-shrink: 0;
-    background: #182033;
-    border: 2px solid var(--card-border);
-    border-radius: 16px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    font-size: 11px;
-    font-weight: 800;
   }
 </style>
 </head>
 <body>
 
-<div id="app">
+<div class="app-container">
+
   <!-- ── TOP HEADER ── -->
   <header class="top-bar">
-    <div class="brand" onclick="navTo('games')">
-      <div class="brand-logo">Rub<span>UP</span></div>
+    <div class="brand" onclick="switchNav('games')">
+      <div class="brand-logo-icon">🔥</div>
+      <div class="brand-title">Loko<span>Coins</span></div>
     </div>
     <div class="header-actions">
-      <div class="balance-pill" onclick="openTopupModal()">
-        <svg class="gem-icon" viewBox="0 0 24 24"><path d="M12 2L2 9l10 13 10-13-10-7z"/></svg>
-        <span id="topStarsDisplay">0,00</span>
-        <svg style="width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+      <div class="balance-pill stars" onclick="switchNav('topup')">
+        <span>⭐</span>
+        <span id="headerStars">0</span>
+        <div class="topup-plus-btn">+</div>
       </div>
-      <button class="btn-topup-nav" onclick="openTopupModal()">Пополнить</button>
-      <div class="user-avatar-badge" id="userAvatar" onclick="openProfileModal()">MR</div>
+      <div class="balance-pill coins" onclick="switchNav('games')">
+        <span>🪙</span>
+        <span id="headerCoins">500</span>
+      </div>
     </div>
   </header>
 
+  <!-- ── STATUS BANNER ── -->
+  <div class="status-banner" onclick="switchNav('profile')">
+    <div class="status-info">
+      <div class="status-badge" id="topStatusBadge">Гость</div>
+      <h4 id="topStatusTitle">Уровень: Гость</h4>
+      <p id="topStatusDesc">Пополните от 50 ⭐ для бонуса +500 🪙</p>
+    </div>
+    <button class="status-btn-small">Профиль</button>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════ -->
   <!-- ── SECTION 1: GAMES (ИГРЫ) ── -->
-  <section id="view-games">
-    <!-- PROMO BANNER (RubUP Style) -->
-    <div class="banner-slider">
-      <div class="promo-banner">
-        <h2>Подарок<br><span style="font-size:15px;font-weight:700;color:#c4b5fd">за пополнение</span></h2>
-        <p>Получи +25% к первому пополнению</p>
-        <button class="btn-banner" onclick="openTopupModal()">Пополнить &gt;</button>
-        <!-- Banner Art -->
-        <svg class="banner-art" viewBox="0 0 160 160">
-          <defs>
-            <radialGradient id="boxGlow" cx="50%" cy="50%" r="50%">
-              <stop offset="0%" stop-color="#8b5cf6" stop-opacity="0.8"/>
-              <stop offset="100%" stop-color="#1e1b4b" stop-opacity="0"/>
-            </radialGradient>
-          </defs>
-          <circle cx="80" cy="80" r="70" fill="url(#boxGlow)"/>
-          <!-- Gift Box -->
-          <g transform="translate(25, 45)">
-            <rect x="15" y="30" width="80" height="60" rx="10" fill="#6366f1"/>
-            <rect x="10" y="20" width="90" height="18" rx="6" fill="#8b5cf6"/>
-            <!-- Ribbon -->
-            <rect x="47" y="20" width="16" height="70" fill="#fbbf24"/>
-            <!-- Bow -->
-            <path d="M40 12 C30 0, 48 0, 52 14 Z" fill="#f59e0b"/>
-            <path d="M70 12 C80 0, 62 0, 58 14 Z" fill="#f59e0b"/>
-          </g>
-          <!-- Crystal / Star flying -->
-          <polygon points="120,30 132,45 120,60 108,45" fill="#38bdf8"/>
-          <polygon points="40,25 48,35 40,45 32,35" fill="#ec4899"/>
-        </svg>
-      </div>
-    </div>
-
-    <!-- LIVE WINNERS STRIP -->
-    <div class="live-strip">
-      <div class="live-tag">LIVE</div>
-      <div class="live-item">
-        <div class="live-thumb">⚡</div>
-        <span>Piper</span>
-        <span class="live-win">+14,5 ⭐</span>
-      </div>
-      <div class="live-item">
-        <div class="live-thumb">👑</div>
-        <span>SmD...</span>
-        <span class="live-win">+14,9 ⭐</span>
-      </div>
-      <div class="live-item">
-        <div class="live-thumb">🚀</div>
-        <span>Даня</span>
-        <span class="live-win">+32,5 ⭐</span>
-      </div>
-      <div class="live-item">
-        <div class="live-thumb">💎</div>
-        <span>Alex</span>
-        <span class="live-win">+50,0 ⭐</span>
-      </div>
-    </div>
-
-    <!-- GAMES SECTION -->
-    <div class="section-head">
-      <h2>Игры</h2>
-      <span class="see-all">Все 4 &gt;</span>
-    </div>
-
-    <div class="grid-2">
-      <!-- 1. АПГРЕЙД -->
-      <div class="game-card" onclick="openGame('upgrade')">
-        <div class="game-cover">
-          <div class="online-badge">441 играют</div>
-          <svg viewBox="0 0 200 210">
-            <defs>
-              <radialGradient id="upBg" cx="50%" cy="50%" r="50%">
-                <stop offset="0%" stop-color="#b91c1c"/>
-                <stop offset="60%" stop-color="#450a0a"/>
-                <stop offset="100%" stop-color="#0a0505"/>
-              </radialGradient>
-              <linearGradient id="goldHelm" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stop-color="#fef08a"/>
-                <stop offset="50%" stop-color="#eab308"/>
-                <stop offset="100%" stop-color="#ca8a04"/>
-              </linearGradient>
-            </defs>
-            <rect width="200" height="210" fill="url(#upBg)"/>
-            <!-- Halo rays -->
-            <circle cx="100" cy="95" r="72" fill="none" stroke="#f59e0b" stroke-width="4" stroke-dasharray="10 6" opacity="0.6"/>
-            <circle cx="100" cy="95" r="60" fill="none" stroke="#ef4444" stroke-width="12" opacity="0.5"/>
-            <!-- Spartan/Upgrade Helmet Icon -->
-            <path d="M100 35 C125 35 140 55 140 85 C140 100 135 125 100 135 C65 125 60 100 60 85 C60 55 75 35 100 35 Z" fill="url(#goldHelm)"/>
-            <!-- Red Crest -->
-            <path d="M96 20 C120 18 135 32 144 55 C132 50 120 45 96 45 Z" fill="#dc2626"/>
-            <!-- T-Visor cut -->
-            <path d="M92 75 H108 V120 H92 Z" fill="#450a0a"/>
-            <path d="M78 80 H122 V92 H78 Z" fill="#450a0a"/>
-            <!-- Upgrade Double Arrows -->
-            <path d="M85 155 L100 142 L115 155 M85 167 L100 154 L115 167" fill="none" stroke="#fde047" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </div>
-        <div class="game-footer">
-          <div class="game-title">Апгрейд</div>
-          <div class="game-action-btn">&gt;</div>
-        </div>
-      </div>
-
-      <!-- 2. ШТОРМ / КРИСТАЛЛЫ -->
-      <div class="game-card" onclick="openGame('storm')">
-        <div class="game-cover">
-          <div class="online-badge">20 играют</div>
-          <svg viewBox="0 0 200 210">
-            <defs>
-              <radialGradient id="stormBg" cx="50%" cy="50%" r="50%">
-                <stop offset="0%" stop-color="#6b21a8"/>
-                <stop offset="60%" stop-color="#3b0764"/>
-                <stop offset="100%" stop-color="#090514"/>
-              </radialGradient>
-              <linearGradient id="crystPink" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stop-color="#fdf4ff"/>
-                <stop offset="40%" stop-color="#f472b6"/>
-                <stop offset="100%" stop-color="#db2777"/>
-              </linearGradient>
-            </defs>
-            <rect width="200" height="210" fill="url(#stormBg)"/>
-            <!-- Lightning and Glow ring -->
-            <ellipse cx="100" cy="115" rx="75" ry="30" fill="none" stroke="#f472b6" stroke-width="3" opacity="0.7"/>
-            <!-- Giant Crystal -->
-            <polygon points="100,30 135,70 145,130 100,165 55,130 65,70" fill="url(#crystPink)"/>
-            <polygon points="100,30 120,70 100,165 80,70" fill="#fbcfe8" opacity="0.6"/>
-            <!-- Multiplier badge -->
-            <rect x="62" y="145" width="76" height="26" rx="8" fill="#18181b"/>
-            <text x="100" y="163" text-anchor="middle" fill="#f472b6" font-size="14" font-weight="900" font-family="sans-serif">500X</text>
-            <!-- Sparks -->
-            <polygon points="135,25 142,40 138,42 145,55 132,45 135,42" fill="#fef08a"/>
-          </svg>
-        </div>
-        <div class="game-footer">
-          <div class="game-title">Шторм</div>
-          <div class="game-action-btn">&gt;</div>
-        </div>
-      </div>
-
-      <!-- 3. РАКЕТКА (Crash) -->
-      <div class="game-card" onclick="openGame('rocket')">
-        <div class="game-cover">
-          <div class="online-badge">101 играет</div>
-          <svg viewBox="0 0 200 210">
-            <defs>
-              <radialGradient id="rktBg" cx="50%" cy="50%" r="50%">
-                <stop offset="0%" stop-color="#1e1b4b"/>
-                <stop offset="60%" stop-color="#0f172a"/>
-                <stop offset="100%" stop-color="#030712"/>
-              </radialGradient>
-              <linearGradient id="rocketBody" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stop-color="#ffffff"/>
-                <stop offset="60%" stop-color="#e0e7ff"/>
-                <stop offset="100%" stop-color="#6366f1"/>
-              </linearGradient>
-            </defs>
-            <rect width="200" height="210" fill="url(#rktBg)"/>
-            <!-- Stars -->
-            <circle cx="35" cy="40" r="1.5" fill="#fff"/><circle cx="165" cy="65" r="2" fill="#38bdf8"/><circle cx="45" cy="150" r="1" fill="#fff"/><circle cx="155" cy="160" r="1.5" fill="#fff"/>
-            <!-- Rocket with Cow rider (RubUP mascot) -->
-            <g transform="translate(100, 105) rotate(-35)">
-              <!-- Flame -->
-              <polygon points="-8,45 0,75 8,45" fill="#f97316"/>
-              <polygon points="-5,45 0,65 5,45" fill="#facc15"/>
-              <!-- Rocket Shell -->
-              <path d="M0 -55 C20 -30 20 20 14 45 H-14 C-20 20 -20 -30 0 -55 Z" fill="url(#rocketBody)"/>
-              <path d="M-14 25 L-28 45 H-14 Z" fill="#ef4444"/>
-              <path d="M14 25 L28 45 H14 Z" fill="#ef4444"/>
-              <!-- Window / Cow face -->
-              <circle cx="0" cy="-10" r="14" fill="#0f172a"/>
-              <circle cx="0" cy="-10" r="11" fill="#f8fafc"/>
-              <ellipse cx="-4" cy="-10" rx="2" ry="4" fill="#0f172a"/>
-              <ellipse cx="4" cy="-10" rx="2" ry="4" fill="#0f172a"/>
-              <ellipse cx="0" cy="-5" rx="6" ry="4" fill="#f472b6"/>
-            </g>
-          </svg>
-        </div>
-        <div class="game-footer">
-          <div class="game-title">Ракетка</div>
-          <div class="game-action-btn">&gt;</div>
-        </div>
-      </div>
-
-      <!-- 4. ДРОВОСЕК (Бесплатно) -->
-      <div class="game-card" onclick="openGame('chop')">
-        <div class="game-cover">
-          <div class="online-badge">102 играют</div>
-          <div class="tag-badge">FREE</div>
-          <svg viewBox="0 0 200 210">
-            <defs>
-              <radialGradient id="chopBg" cx="50%" cy="50%" r="50%">
-                <stop offset="0%" stop-color="#14532d"/>
-                <stop offset="60%" stop-color="#052e16"/>
-                <stop offset="100%" stop-color="#02140a"/>
-              </radialGradient>
-            </defs>
-            <rect width="200" height="210" fill="url(#chopBg)"/>
-            <!-- Big Oak Tree & Axe -->
-            <rect x="85" y="70" width="30" height="100" fill="#78350f" rx="6"/>
-            <!-- Foliage Clouds -->
-            <circle cx="75" cy="75" r="35" fill="#22c55e"/>
-            <circle cx="125" cy="75" r="35" fill="#16a34a"/>
-            <circle cx="100" cy="45" r="40" fill="#4ade80"/>
-            <!-- Golden Axe striking -->
-            <g transform="translate(100, 110) rotate(25)">
-              <rect x="-4" y="-30" width="8" height="60" rx="3" fill="#92400e"/>
-              <path d="M4 -25 C25 -25 35 -5 4 -5 Z" fill="#e2e8f0"/>
-              <path d="M12 -25 C28 -25 32 -5 12 -5 Z" fill="#38bdf8"/>
-            </g>
-            <!-- Wood Chips -->
-            <circle cx="140" cy="115" r="3" fill="#fde047"/>
-            <circle cx="65" cy="120" r="4" fill="#fde047"/>
-          </svg>
-        </div>
-        <div class="game-footer">
-          <div class="game-title">Дровосек</div>
-          <div class="game-action-btn">&gt;</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ── SECTION 2: CASES (КЕЙСЫ - RubUP Style) ── -->
-  <section id="view-cases" class="hidden">
-    <!-- Category Filter Chips -->
-    <div class="category-chips">
-      <button class="cat-chip active">Все</button>
-      <button class="cat-chip">GTA VI</button>
-      <button class="cat-chip">На сдачу</button>
-      <button class="cat-chip">VIP</button>
-      <button class="cat-chip">Лимитированные</button>
-    </div>
-
-    <div class="section-head">
-      <h2>Кейсы GTA & RubUP</h2>
-      <span class="see-all">Все 6 &gt;</span>
-    </div>
-
-    <div class="grid-2">
-      <!-- Case 1: Вайс-Сити -->
-      <div class="case-card" onclick="openCaseModal('vice')">
-        <span class="badge-new">Новый</span>
-        <div class="case-art-box">
-          <svg viewBox="0 0 160 160">
-            <defs>
-              <radialGradient id="cs1Glow" cx="50%" cy="50%" r="50%">
-                <stop offset="0%" stop-color="#d946ef" stop-opacity="0.8"/>
-                <stop offset="100%" stop-color="#0d111d" stop-opacity="0"/>
-              </radialGradient>
-            </defs>
-            <circle cx="80" cy="80" r="70" fill="url(#cs1Glow)"/>
-            <!-- Lifebuoy with Champagne -->
-            <ellipse cx="80" cy="95" rx="55" ry="30" fill="#38bdf8" stroke="#fff" stroke-width="6"/>
-            <!-- Champagne bottle -->
-            <g transform="translate(80, 75) rotate(-15)">
-              <rect x="-9" y="-45" width="18" height="60" rx="5" fill="#ca8a04"/>
-              <rect x="-4" y="-60" width="8" height="20" rx="2" fill="#eab308"/>
-              <rect x="-8" y="-30" width="16" height="20" fill="#fef08a"/>
-            </g>
-            <!-- Neon sunglasses & cocktail -->
-            <polygon points="35,45 60,40 50,60" fill="#ec4899"/>
-            <polygon points="125,45 100,40 110,60" fill="#ec4899"/>
-          </svg>
-        </div>
-        <div class="case-meta">
-          <div class="case-name">Вайс-Сити</div>
-          <div class="case-price-pill">1 ⭐</div>
-        </div>
-      </div>
-
-      <!-- Case 2: Розыск -->
-      <div class="case-card" onclick="openCaseModal('wanted')">
-        <span class="badge-new">Новый</span>
-        <div class="case-art-box">
-          <svg viewBox="0 0 160 160">
-            <defs>
-              <radialGradient id="cs2Glow" cx="50%" cy="50%" r="50%">
-                <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.8"/>
-                <stop offset="100%" stop-color="#0d111d" stop-opacity="0"/>
-              </radialGradient>
-            </defs>
-            <circle cx="80" cy="80" r="70" fill="url(#cs2Glow)"/>
-            <!-- Police Monkey Mascot -->
-            <circle cx="80" cy="85" r="42" fill="#78350f"/>
-            <circle cx="80" cy="90" r="32" fill="#d97706"/>
-            <!-- Police Hat -->
-            <path d="M50 65 C50 40 110 40 110 65 Z" fill="#1e3a8a"/>
-            <ellipse cx="80" cy="65" rx="36" ry="7" fill="#172554"/>
-            <!-- Sunglasses -->
-            <rect x="60" y="75" width="18" height="14" rx="4" fill="#09090b"/>
-            <rect x="82" y="75" width="18" height="14" rx="4" fill="#09090b"/>
-            <!-- Pink Donuts in hands -->
-            <circle cx="45" cy="100" r="12" fill="#ec4899" stroke="#78350f" stroke-width="4"/>
-            <circle cx="115" cy="100" r="12" fill="#ec4899" stroke="#78350f" stroke-width="4"/>
-          </svg>
-        </div>
-        <div class="case-meta">
-          <div class="case-name">Розыск</div>
-          <div class="case-price-pill">2,5 ⭐</div>
-        </div>
-      </div>
-
-      <!-- Case 3: Сейф -->
-      <div class="case-card" onclick="openCaseModal('safe')">
-        <span class="badge-new">Новый</span>
-        <div class="case-art-box">
-          <svg viewBox="0 0 160 160">
-            <defs>
-              <radialGradient id="cs3Glow" cx="50%" cy="50%" r="50%">
-                <stop offset="0%" stop-color="#eab308" stop-opacity="0.7"/>
-                <stop offset="100%" stop-color="#0d111d" stop-opacity="0"/>
-              </radialGradient>
-            </defs>
-            <circle cx="80" cy="80" r="70" fill="url(#cs3Glow)"/>
-            <!-- Bank Safe Box -->
-            <rect x="40" y="45" width="80" height="80" rx="14" fill="#64748b" stroke="#eab308" stroke-width="3"/>
-            <circle cx="80" cy="85" r="24" fill="#475569" stroke="#fbbf24" stroke-width="4"/>
-            <!-- Safe Handle Wheel -->
-            <circle cx="80" cy="85" r="10" fill="#f59e0b"/>
-            <line x1="80" y1="65" x2="80" y2="105" stroke="#fef08a" stroke-width="4"/>
-            <line x1="60" y1="85" x2="100" y2="85" stroke="#fef08a" stroke-width="4"/>
-            <!-- Money Bundles on sides -->
-            <rect x="18" y="105" width="30" height="16" rx="4" fill="#10b981"/>
-            <rect x="112" y="105" width="30" height="16" rx="4" fill="#10b981"/>
-          </svg>
-        </div>
-        <div class="case-meta">
-          <div class="case-name">Сейф Мафии</div>
-          <div class="case-price-pill">5 ⭐</div>
-        </div>
-      </div>
-
-      <!-- Case 4: Лоурайдер -->
-      <div class="case-card" onclick="openCaseModal('lowrider')">
-        <span class="badge-new">Новый</span>
-        <div class="case-art-box">
-          <svg viewBox="0 0 160 160">
-            <defs>
-              <radialGradient id="cs4Glow" cx="50%" cy="50%" r="50%">
-                <stop offset="0%" stop-color="#a855f7" stop-opacity="0.8"/>
-                <stop offset="100%" stop-color="#0d111d" stop-opacity="0"/>
-              </radialGradient>
-            </defs>
-            <circle cx="80" cy="80" r="70" fill="url(#cs4Glow)"/>
-            <!-- Neon Lowrider Car -->
-            <g transform="translate(80, 85)">
-              <rect x="-55" y="-10" width="110" height="30" rx="8" fill="#9333ea" stroke="#f472b6" stroke-width="3"/>
-              <rect x="-35" y="-28" width="70" height="20" rx="4" fill="#c084fc"/>
-              <!-- Wheels -->
-              <circle cx="-35" cy="20" r="14" fill="#0f172a" stroke="#e2e8f0" stroke-width="4"/>
-              <circle cx="35" cy="20" r="14" fill="#0f172a" stroke="#e2e8f0" stroke-width="4"/>
-              <!-- Neon Pedestal -->
-              <polygon points="-65,30 65,30 50,42 -50,42" fill="#ec4899"/>
-            </g>
-          </svg>
-        </div>
-        <div class="case-meta">
-          <div class="case-name">Лоурайдер</div>
-          <div class="case-price-pill">10 ⭐</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ── SECTION 3: EARN (ЗАРАБОТОК) ── -->
-  <section id="view-earn" class="hidden">
-    <div class="section-head">
-      <h2>Заработок без вложений</h2>
-    </div>
-    <div style="padding: 0 16px;">
-      <!-- Chop tree task -->
-      <div class="card-box" style="display:flex;align-items:center;gap:14px;cursor:pointer" onclick="openGame('chop')">
-        <div style="font-size:36px;">🪓</div>
-        <div style="flex:1">
-          <b style="font-size:15px;color:#fff">Игра «Дровосек»</b>
-          <div style="font-size:12px;color:var(--text-muted)">Руби деревья и зарабатывай бесплатные LOGO</div>
-        </div>
-        <button class="btn-topup-nav" style="padding:6px 12px">Играть</button>
-      </div>
-
-      <!-- Daily Case -->
-      <div class="card-box" style="display:flex;align-items:center;gap:14px;cursor:pointer" onclick="openFreeCase()">
-        <div style="font-size:36px;">🎁</div>
-        <div style="flex:1">
-          <b style="font-size:15px;color:#fff">Ежедневный кейс</b>
-          <div style="font-size:12px;color:var(--text-muted)">Бесплатное открытие каждые 24 часа</div>
-        </div>
-        <button class="btn-topup-nav" id="btnFreeDaily" style="padding:6px 12px">Крутить</button>
-      </div>
-
-      <!-- Invite Friends -->
-      <div class="card-box" style="display:flex;align-items:center;gap:14px;cursor:pointer" onclick="copyRefLink()">
-        <div style="font-size:36px;">👥</div>
-        <div style="flex:1">
-          <b style="font-size:15px;color:#fff">Реферальная программа</b>
-          <div style="font-size:12px;color:var(--text-muted)">Получай 10% от пополнений друзей</div>
-        </div>
-        <button class="btn-topup-nav" style="padding:6px 12px">Ссылка</button>
-      </div>
-    </div>
-  </section>
-
-  <!-- ── SECTION 4: BONUSES (БОНУСЫ & ПРОМОКОДЫ) ── -->
-  <section id="view-bonuses" class="hidden">
-    <div class="section-head">
-      <h2>Бонусы и Промокоды</h2>
-    </div>
-    <div style="padding: 0 16px;">
-      <!-- Promo box -->
-      <div class="card-box">
-        <div class="field-label">Активировать промокод</div>
-        <div style="display:flex;gap:8px;margin-top:8px">
-          <input type="text" id="promoInput" class="input-text" placeholder="ВВЕДИТЕ ПРОМОКОД" style="text-transform:uppercase">
-          <button class="btn-action" style="width:auto;padding:0 20px" onclick="applyPromo()">OK</button>
-        </div>
-        <div style="font-size:11px;color:var(--text-dim);margin-top:8px">Попробуй промокод: <b>RUBUP</b> или <b>LOGO10</b></div>
-      </div>
-
-      <!-- Deposit Requests History for User -->
-      <div class="section-head" style="padding:10px 0">
-        <h2>Мои заявки на пополнение</h2>
-      </div>
-      <div id="userDepositRequestsList">
-        <div style="font-size:13px;color:var(--text-muted);text-align:center;padding:20px">Заявок пока нет</div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ── BOTTOM NAVIGATION BAR ── -->
-  <nav class="bottom-nav">
-    <button class="nav-btn active" data-tab="games" onclick="navTo('games')">
-      <svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="4"/><path d="M6 12h4m-2-2v4m10-2h.01m-3 0h.01"/></svg>
-      <span>Игры</span>
-    </button>
-    <button class="nav-btn" data-tab="cases" onclick="navTo('cases')">
-      <svg viewBox="0 0 24 24"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5M12 22V12"/></svg>
-      <span>Кейсы</span>
-    </button>
-    <button class="nav-btn" data-tab="earn" onclick="navTo('earn')">
-      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v12m-4-8h8"/></svg>
-      <span>Заработок</span>
-    </button>
-    <button class="nav-btn" data-tab="bonuses" onclick="navTo('bonuses')">
-      <svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13m-7-9v9h14v-9M12 8c-2-3-5-3-5 0s5 0 5 0zm0 0c2-3 5-3 5 0s-5 0-5 0z"/></svg>
-      <span>Бонусы</span>
-    </button>
-  </nav>
-
-  <!-- ══════════════════════════════════════════════ -->
-  <!-- ── MODAL: TOP-UP (НОВАЯ СИСТЕМА С ЧЕКАМИ) ── -->
-  <!-- ══════════════════════════════════════════════ -->
-  <div id="modalTopup" class="modal-overlay hidden">
-    <div class="modal-sheet">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-        <h3 style="font-size:18px;font-weight:900">Пополнение баланса</h3>
-        <button class="btn-icon" onclick="closeModal('modalTopup')">✕</button>
-      </div>
-
-      <div class="field-label">1. Введите сумму (в рублях)</div>
-      <input type="number" id="topupAmountRub" class="input-text" placeholder="Сумма, например 500" value="500" oninput="calcStarsFromRub()">
-      
-      <div style="display:flex;justify-content:space-between;margin:6px 0 14px;font-size:12px;font-weight:800;color:var(--star)">
-        <span>К зачислению:</span>
-        <span id="starsCalcPreview">250 ⭐</span>
-      </div>
-
-      <div class="field-label">2. Переведите на банковскую карту</div>
-      <div class="requisites-box">
-        <div class="req-row">
-          <span style="color:var(--text-muted)">Банк:</span>
-          <b id="reqBankName" style="color:#fff">Сбербанк / Т-Банк</b>
-        </div>
-        <div class="req-row">
-          <span style="color:var(--text-muted)">Номер карты:</span>
-          <span class="req-val" onclick="copyCardNumber()" id="reqCardNum">2200 7000 1234 5678 📋</span>
-        </div>
-        <div class="req-row">
-          <span style="color:var(--text-muted)">Получатель:</span>
-          <b id="reqCardHolder" style="color:#fff">ИВАН И.</b>
-        </div>
-      </div>
-
-      <div class="field-label">3. Загрузите скриншот чека</div>
-      <label class="upload-area" for="receiptFileInput">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4m14-7-5-5-5 5m5-5v12"/></svg>
-        <div id="uploadStatusText" style="font-size:13px;font-weight:800;color:#fff">Нажмите, чтобы выбрать чек об оплате</div>
-        <div style="font-size:11px;color:var(--text-dim);margin-top:2px">PNG, JPG или WEBP</div>
-      </label>
-      <input type="file" id="receiptFileInput" accept="image/*,application/pdf" class="hidden" onchange="onReceiptSelected(this)">
-
-      <button class="btn-action" id="btnSubmitReceipt" onclick="submitDepositRequest()">
-        <span>Отправить чек на проверку</span>
+  <!-- ══════════════════════════════════════════════════ -->
+  <section id="sec-games" class="tab-section">
+    
+    <!-- Game Switcher Buttons -->
+    <div class="game-selector">
+      <button class="game-sel-btn active" onclick="selectGame('upgrade')">
+        <span class="emoji">🎡</span>
+        <span>Апгрейд</span>
       </button>
-
-      <div style="font-size:11px;color:var(--text-dim);text-align:center;margin-top:10px;line-height:1.4">
-        Администратор проверит поступление средств и начислит звёзды на баланс.
-      </div>
+      <button class="game-sel-btn" onclick="selectGame('rocket')">
+        <span class="emoji">🚀</span>
+        <span>Ракета</span>
+      </button>
+      <button class="game-sel-btn" onclick="selectGame('tap')">
+        <span class="emoji">⚡</span>
+        <span>Тапалка</span>
+      </button>
     </div>
-  </div>
 
-  <!-- ── MODAL: ADMIN PANEL ── -->
-  <div id="modalAdmin" class="modal-overlay hidden">
-    <div class="modal-sheet" style="max-width:440px">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-        <h3 style="font-size:18px;font-weight:900">Админ-Панель</h3>
-        <button class="btn-icon" onclick="closeModal('modalAdmin')">✕</button>
-      </div>
-
-      <!-- Settings Block -->
-      <div class="card-box">
-        <div class="field-label">Настройки реквизитов</div>
-        <input type="text" id="admCardNum" class="input-text" placeholder="Номер карты" style="margin-bottom:6px">
-        <input type="text" id="admCardHolder" class="input-text" placeholder="Получатель (Имя)" style="margin-bottom:6px">
-        <input type="text" id="admCardBank" class="input-text" placeholder="Банк" style="margin-bottom:6px">
-        <input type="text" id="admRate" class="input-text" placeholder="Курс (рублей за 1 звезду, например 2.0)" style="margin-bottom:10px">
-        <button class="btn-action" style="padding:10px" onclick="saveAdminSettings()">Сохранить реквизиты</button>
-      </div>
-
-      <!-- Requests List -->
-      <div class="field-label" style="margin-top:10px">Заявки на пополнение (<span id="admReqsCount">0</span>)</div>
-      <div id="adminRequestsList">
-        <div style="color:var(--text-muted);font-size:13px;text-align:center;padding:15px">Заявок нет</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ── MODAL: CASE ROULETTE ── -->
-  <div id="modalCaseRoulette" class="modal-overlay hidden">
-    <div class="modal-sheet" style="text-align:center">
-      <h3 id="crlCaseName" style="font-size:20px;font-weight:900;margin-bottom:10px">Кейс</h3>
-      <div class="roulette-box">
-        <div class="roulette-pointer"></div>
-        <div id="crlTrack" class="roulette-track"></div>
-      </div>
-      <div id="crlWonBox" class="hidden" style="margin:14px 0">
-        <div class="field-label">Твой выигрыш</div>
-        <div id="crlWonText" style="font-size:24px;font-weight:900;color:var(--star)"></div>
-      </div>
-      <button class="btn-action" id="btnCrlClaim" disabled onclick="closeModal('modalCaseRoulette')">Забрать приз</button>
-    </div>
-  </div>
-
-  <!-- ── SCREEN: ROCKET (CRASH) ── -->
-  <div id="screen-rocket" class="screen hidden">
-    <div class="screen-header">
-      <button class="btn-icon" onclick="closeScreen('screen-rocket')">✕</button>
-      <h3>Игра «Ракетка»</h3>
-      <div class="balance-pill"><span class="user-stars-val">0</span> ⭐</div>
-    </div>
-    <div class="game-container">
-      <div class="game-display-card">
-        <div class="rocket-sky" id="rktSky">
-          <div class="mult-text" id="rktMult">1.00x</div>
-          <svg class="rocket-sprite" id="rktSprite" viewBox="0 0 64 64">
-            <polygon points="26,44 32,60 38,44" fill="#f97316"/>
-            <polygon points="29,44 32,54 35,44" fill="#facc15"/>
-            <path d="M32 4 C42 14 44 30 40 44 H24 C20 30 22 14 32 4 Z" fill="#fff"/>
-            <circle cx="32" cy="22" r="5" fill="#6366f1"/>
-            <path d="M24 34 L14 46 L24 42 Z M40 34 L50 46 L40 42 Z" fill="#ef4444"/>
-          </svg>
+    <!-- ── GAME 1: UPGRADE ── -->
+    <div id="game-upgrade" class="game-view active">
+      <div class="game-card">
+        <div class="section-head" style="margin-top:0">
+          <h3>🎡 Колесо Апгрейда</h3>
+          <span style="font-size:11px;color:var(--accent-violet);font-weight:800">Фиолетовая зона = Победа!</span>
         </div>
-      </div>
-      <div class="card-box">
-        <div class="field-label">Ваша ставка (в звёздах)</div>
-        <div style="display:flex;gap:8px;margin-bottom:12px">
-          <button class="cat-chip active chip-rbet" onclick="setRBet(1)">1 ⭐</button>
-          <button class="cat-chip chip-rbet" onclick="setRBet(5)">5 ⭐</button>
-          <button class="cat-chip chip-rbet" onclick="setRBet(10)">10 ⭐</button>
-          <button class="cat-chip chip-rbet" onclick="setRBet(25)">25 ⭐</button>
-        </div>
-        <button class="btn-action" id="btnRktGo" onclick="rocketStart()">Взлететь</button>
-        <button class="btn-action" id="btnRktCash" style="background:#10b981;margin-top:8px" disabled onclick="rocketCashout()">Забрать</button>
-      </div>
-    </div>
-  </div>
 
-  <!-- ── SCREEN: UPGRADE (КОЛЕСО) ── -->
-  <div id="screen-upgrade" class="screen hidden">
-    <div class="screen-header">
-      <button class="btn-icon" onclick="closeScreen('screen-upgrade')">✕</button>
-      <h3>Апгрейд</h3>
-      <div class="balance-pill"><span class="user-stars-val">0</span> ⭐</div>
+        <div class="upgrade-wheel-area">
+          <div class="wheel-box">
+            <div class="wheel-arrow"></div>
+            <canvas id="wheelCanvas" width="220" height="220"></canvas>
+            <div class="wheel-center-badge">
+              <span id="wheelCenterMult">2.0x</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <div class="control-label">
+            <span>Выберите множитель:</span>
+            <span id="upgradeWinChanceText" style="color:var(--accent-yellow)">Шанс: 45%</span>
+          </div>
+          <div class="multiplier-grid">
+            <button class="multi-btn" onclick="setUpgradeMult(1.5)">1.5x</button>
+            <button class="multi-btn active" onclick="setUpgradeMult(2.0)">2.0x</button>
+            <button class="multi-btn" onclick="setUpgradeMult(3.0)">3.0x</button>
+            <button class="multi-btn" onclick="setUpgradeMult(5.0)">5.0x</button>
+            <button class="multi-btn" onclick="setUpgradeMult(10.0)">10x</button>
+            <button class="multi-btn" onclick="setUpgradeMult(20.0)">20x</button>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <div class="control-label">
+            <span>Сумма ставки:</span>
+            <div class="currency-toggle">
+              <button class="currency-btn active" id="upgCurrStars" onclick="setUpgradeCurrency('stars')">⭐ Звёзды</button>
+              <button class="currency-btn" id="upgCurrCoins" onclick="setUpgradeCurrency('coins')">🪙 Coins</button>
+            </div>
+          </div>
+          <div class="bet-input-wrap">
+            <input type="number" id="upgradeBetInput" class="bet-input" value="5" min="1">
+          </div>
+          <div class="chip-row">
+            <button class="chip-btn" onclick="setUpgradeBet(1)">1</button>
+            <button class="chip-btn" onclick="setUpgradeBet(5)">5</button>
+            <button class="chip-btn" onclick="setUpgradeBet(10)">10</button>
+            <button class="chip-btn" onclick="setUpgradeBet(25)">25</button>
+            <button class="chip-btn" onclick="setUpgradeBet(50)">50</button>
+          </div>
+        </div>
+
+        <button id="upgradeSpinBtn" class="main-action-btn" onclick="playUpgrade()">
+          <span>Крутить колесо</span>
+        </button>
+      </div>
     </div>
-    <div class="game-container">
-      <div class="game-display-card" style="padding:24px 16px">
-        <div style="position:relative;width:200px;height:200px;margin:0 auto">
-          <svg viewBox="0 0 200 200" style="width:100%;height:100%">
-            <circle cx="100" cy="100" r="80" fill="none" stroke="#1f293d" stroke-width="16"/>
-            <circle id="upgArc" cx="100" cy="100" r="80" fill="none" stroke="#8b5cf6" stroke-width="16" transform="rotate(-90 100 100)" stroke-dasharray="0 502"/>
-            <g id="upgPointer"><line x1="100" y1="100" x2="100" y2="18" stroke="#fff" stroke-width="4" stroke-linecap="round"/><polygon points="100,10 94,24 106,24" fill="#fff"/></g>
-            <circle cx="100" cy="100" r="8" fill="#fff"/>
-          </svg>
-          <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none">
-            <b id="upgChanceText" style="font-size:32px;font-weight:900">46%</b>
-            <span style="font-size:10px;color:var(--text-dim);font-weight:800">ШАНС</span>
+
+    <!-- ── GAME 2: ROCKET (CRASH) ── -->
+    <div id="game-rocket" class="game-view">
+      <div class="game-card">
+        <div class="section-head" style="margin-top:0">
+          <h3>🚀 Ракета (Crash)</h3>
+          <span style="font-size:11px;color:var(--accent-yellow);font-weight:800">Успей забрать до взрыва!</span>
+        </div>
+
+        <div class="crash-screen">
+          <canvas id="crashCanvas"></canvas>
+          <div class="crash-mult-hud">
+            <div class="crash-mult-val" id="crashMultText">1.00x</div>
+            <div class="crash-status-text" id="crashStatusText">Ожидание взлёта</div>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <div class="control-label">
+            <span>Сумма ставки:</span>
+            <div class="currency-toggle">
+              <button class="currency-btn active" id="rockCurrStars" onclick="setRocketCurrency('stars')">⭐ Звёзды</button>
+              <button class="currency-btn" id="rockCurrCoins" onclick="setRocketCurrency('coins')">🪙 Coins</button>
+            </div>
+          </div>
+          <div class="bet-input-wrap">
+            <input type="number" id="rocketBetInput" class="bet-input" value="5" min="1">
+          </div>
+          <div class="chip-row">
+            <button class="chip-btn" onclick="setRocketBet(1)">1</button>
+            <button class="chip-btn" onclick="setRocketBet(5)">5</button>
+            <button class="chip-btn" onclick="setRocketBet(10)">10</button>
+            <button class="chip-btn" onclick="setRocketBet(25)">25</button>
+            <button class="chip-btn" onclick="setRocketBet(50)">50</button>
+          </div>
+        </div>
+
+        <button id="rocketLaunchBtn" class="main-action-btn" onclick="toggleRocketFlight()">
+          <span>Взлететь 🚀</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- ── GAME 3: TAP GAME (ТАПАЛКА) ── -->
+    <div id="game-tap" class="game-view">
+      <div class="game-card">
+        <div class="section-head" style="margin-top:0">
+          <h3>⚡ Loko Тапалка</h3>
+          <span style="font-size:11px;color:var(--accent-yellow);font-weight:800">Без ставок — играй и побеждай!</span>
+        </div>
+
+        <div class="tap-area-wrap">
+          <div class="tap-score-counter">
+            <div class="tap-score-num" id="tapCurrentScore">0</div>
+            <div class="tap-score-label">Очков в этом раунде</div>
+          </div>
+
+          <div class="tap-coin-btn" id="tapCoinElement" onclick="handleCoinTap(event)">
+            <div class="tap-coin-inner">🔥</div>
+          </div>
+        </div>
+
+        <!-- Leaderboard & Prizes -->
+        <div class="leaderboard-card">
+          <div class="leaderboard-title">
+            <span>🏆 Таблица лидеров</span>
+            <span style="color:var(--accent-yellow)">Призы сезона</span>
+          </div>
+
+          <div style="font-size:11px;color:var(--text-muted);margin-bottom:8px">
+            🥇 1 место: <b>50 ⭐</b> | 🥈 2 место: <b>25 ⭐</b> | 🥉 3 место: <b>1000 🪙</b>
+          </div>
+
+          <div id="tapLeaderboardRows">
+            <!-- Dynamic leader rows -->
           </div>
         </div>
       </div>
-      <div class="card-box">
-        <div class="field-label">1. Ставка</div>
-        <div style="display:flex;gap:6px;margin-bottom:10px">
-          <button class="cat-chip active upg-amt" onclick="setUpgAmt(1)">1 ⭐</button>
-          <button class="cat-chip upg-amt" onclick="setUpgAmt(5)">5 ⭐</button>
-          <button class="cat-chip upg-amt" onclick="setUpgAmt(10)">10 ⭐</button>
-          <button class="cat-chip upg-amt" onclick="setUpgAmt(25)">25 ⭐</button>
-        </div>
-        <div class="field-label">2. Множитель</div>
-        <div style="display:flex;gap:6px;margin-bottom:14px">
-          <button class="cat-chip active upg-mult" onclick="setUpgMult(1.5)">x1.5</button>
-          <button class="cat-chip upg-mult" onclick="setUpgMult(2)">x2</button>
-          <button class="cat-chip upg-mult" onclick="setUpgMult(3)">x3</button>
-          <button class="cat-chip upg-mult" onclick="setUpgMult(5)">x5</button>
-        </div>
-        <button class="btn-action" id="btnUpgSpin" onclick="spinUpgrade()">Умножить ставку</button>
-      </div>
     </div>
-  </div>
 
-  <!-- ── SCREEN: CHOPPER (ДРОВОСЕК) ── -->
-  <div id="screen-chop" class="screen hidden">
-    <div class="screen-header">
-      <button class="btn-icon" onclick="closeScreen('screen-chop')">✕</button>
-      <h3>Дровосек (Бесплатно)</h3>
-      <div class="balance-pill"><span id="userCoinsVal">0</span> 🪙</div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════ -->
+  <!-- ── SECTION 2: CASES (КЕЙСЫ) ── -->
+  <!-- ══════════════════════════════════════════════════ -->
+  <section id="sec-cases" class="tab-section" style="display:none">
+    <div class="section-head">
+      <h3>📦 Премиальные кейсы</h3>
+      <span style="font-size:12px;color:var(--text-muted)">4 кейса с подарками</span>
     </div>
-    <div class="game-container">
-      <div class="game-display-card">
-        <div style="font-size:13px;font-weight:800;margin-bottom:8px;color:#a5b4fc">
-          Уровень <span id="chLvl">1</span> · Комбо x<span id="chCombo">1</span>
+
+    <div class="cases-grid">
+
+      <!-- Case 1: Beach -->
+      <div class="case-item-card" onclick="openCaseModal('beach')">
+        <div class="case-icon-box">🧸</div>
+        <div class="case-name">Пляжный кейс</div>
+        <div class="case-desc">Почти всегда выпадает редкий Пляжный Мишка + монеты!</div>
+        <button class="case-open-btn">
+          <span>15 ⭐</span>
+          <span>Открыть</span>
+        </button>
+      </div>
+
+      <!-- Case 2: Gift -->
+      <div class="case-item-card" onclick="openCaseModal('gift')">
+        <div class="case-icon-box">🎁</div>
+        <div class="case-name">Подарочный кейс</div>
+        <div class="case-desc">Telegram-подарки от 15 звёзд и солидный куш LokoCoins!</div>
+        <button class="case-open-btn">
+          <span>20 ⭐</span>
+          <span>Открыть</span>
+        </button>
+      </div>
+
+      <!-- Case 3: Rare (NFT 0.5%) -->
+      <div class="case-item-card has-nft" onclick="openCaseModal('rare')">
+        <div class="case-badge-nft">NFT 0.5%</div>
+        <div class="case-icon-box">💎</div>
+        <div class="case-name">Редкий кейс</div>
+        <div class="case-desc">Telegram-подарки + шанс 0.5% на эксклюзивный NFT-подарок!</div>
+        <button class="case-open-btn">
+          <span>25 ⭐</span>
+          <span>Открыть</span>
+        </button>
+      </div>
+
+      <!-- Case 4: Elite (NFT 1.0%) -->
+      <div class="case-item-card has-nft" onclick="openCaseModal('elite')">
+        <div class="case-badge-nft">NFT 1.0%</div>
+        <div class="case-icon-box">🏆</div>
+        <div class="case-name">Элитный кейс</div>
+        <div class="case-desc">Премиальные подарки и повышенный шанс 1% на редчайший NFT!</div>
+        <button class="case-open-btn">
+          <span>50 ⭐</span>
+          <span>Открыть</span>
+        </button>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════ -->
+  <!-- ── SECTION 3: PROFILE (ПРОФИЛЬ) ── -->
+  <!-- ══════════════════════════════════════════════════ -->
+  <section id="sec-profile" class="tab-section" style="display:none">
+    
+    <div class="profile-card">
+      <div class="profile-user-head">
+        <div class="user-avatar" id="profAvatar">🔥</div>
+        <div class="user-meta">
+          <h3 id="profUserName">Игрок</h3>
+          <p id="profUserId">ID: 000000</p>
         </div>
-        <div style="position:relative;width:180px;height:180px;margin:0 auto">
-          <svg viewBox="0 0 200 200" style="width:100%;height:100%">
-            <circle cx="100" cy="100" r="82" fill="none" stroke="#1f293d" stroke-width="12"/>
-            <path d="M72 20 A82 82 0 0 1 128 20" fill="none" stroke="#10b981" stroke-width="12" stroke-linecap="round"/>
-            <g id="chNeedle"><line x1="100" y1="100" x2="100" y2="28" stroke="#38bdf8" stroke-width="5" stroke-linecap="round"/><circle cx="100" cy="26" r="6" fill="#3b82f6"/></g>
-          </svg>
-          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:52px">
-            🌲
+      </div>
+
+      <!-- Status System Card -->
+      <div class="tier-progress-box">
+        <div class="tier-label-row">
+          <span>Статус аккаунта:</span>
+          <span class="tier-current-name" id="profStatusName">Гость</span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" id="profProgressBar" style="width: 15%"></div>
+        </div>
+
+        <div class="status-benefits-grid">
+          <div class="benefit-mini">
+            <b>Гость</b>
+            <span>При первом входе</span>
+          </div>
+          <div class="benefit-mini">
+            <b>Местный (50 ⭐)</b>
+            <span>Бонус +500 🪙</span>
+          </div>
+          <div class="benefit-mini">
+            <b>Крутой (150 ⭐)</b>
+            <span>Бонус +25 ⭐</span>
+          </div>
+          <div class="benefit-mini">
+            <b>Элита (500 ⭐)</b>
+            <span>Бонус +250 ⭐, +1000 🪙</span>
           </div>
         </div>
-        <div id="chStatus" style="font-size:13px;font-weight:800;color:var(--text-muted);min-height:20px;margin-top:10px">
-          Останови стрелку в зелёной зоне!
+      </div>
+
+      <!-- Referral Link Box -->
+      <div class="ref-box">
+        <div class="control-label">
+          <span>Ваша реферальная ссылка:</span>
+          <span id="refCountText">Друзей: 0</span>
+        </div>
+        <div class="ref-link-row">
+          <input type="text" id="refLinkInput" class="ref-input" readonly value="https://t.me/LokoCoins_Bot?start=ref_0">
+          <button class="copy-btn" onclick="copyRefLink()">Копировать</button>
         </div>
       </div>
-      <button class="btn-action" style="padding:18px;font-size:17px" onclick="chopHit()">УДАР ТОПОРОМ!</button>
-    </div>
-  </div>
 
-  <!-- ── TOAST NOTIFICATION ── -->
-  <div id="toast" class="toast">Уведомление</div>
+      <!-- Promo Code Box -->
+      <div class="ref-box" style="margin-top:10px">
+        <div class="control-label">
+          <span>Активировать промокод:</span>
+          <span style="font-size:11px;color:var(--accent-yellow)">LOKO10 или BONUS</span>
+        </div>
+        <div class="promo-row">
+          <input type="text" id="promoCodeInput" class="promo-input" placeholder="ПРОМОКОД">
+          <button class="promo-btn" onclick="applyPromoCode()">OK</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Inventory Box -->
+    <div class="profile-card">
+      <div class="section-head" style="margin-top:0">
+        <h3>🎒 Инвентарь (Подарки и NFT)</h3>
+        <span id="invCountText" style="font-size:12px;color:var(--text-muted)">0 предм.</span>
+      </div>
+
+      <div class="inventory-grid" id="inventoryGrid">
+        <div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--text-muted);font-size:13px">
+          В инвентаре пока пусто. Открывайте кейсы, чтобы получать подарки и NFT!
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ══════════════════════════════════════════════════ -->
+  <!-- ── SECTION 4: TOP-UP (ПОПОЛНЕНИЕ) ── -->
+  <!-- ══════════════════════════════════════════════════ -->
+  <section id="sec-topup" class="tab-section" style="display:none">
+    <div class="section-head">
+      <h3>💳 Пополнение баланса</h3>
+      <span style="font-size:12px;color:var(--accent-yellow)">Курс: 2000 сум = 1 ⭐</span>
+    </div>
+
+    <!-- Top-up Method Switcher -->
+    <div class="topup-method-toggle">
+      <button class="method-tab-btn active" id="btnMethodCard" onclick="switchTopupMethod('card')">
+        💳 Банковская карта
+      </button>
+      <button class="method-tab-btn" id="btnMethodGift" onclick="switchTopupMethod('gift')">
+        🎁 TG-Подарки
+      </button>
+    </div>
+
+    <!-- METHOD 1: CARD (UZS) -->
+    <div id="pane-card" class="topup-pane active">
+      <div class="game-card">
+        <div class="card-details-box">
+          <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px">Реквизиты для перевода:</div>
+          <div class="card-num-text">
+            <span id="displayCardNum">5614 6812 5962 4009</span>
+            <button class="copy-card-btn" onclick="copyCardNumber()">Копировать</button>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text-muted)">
+            <span>Получатель: <b style="color:#fff" id="displayCardHolder">Nafisa Xalimova</b></span>
+            <span>Банк: <b>Uzcard / Humo</b></span>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <div class="control-label">
+            <span>Сумма перевода (в сумах):</span>
+            <span id="calcStarsPreview" style="color:var(--accent-yellow);font-weight:800">Вы получите: 15 ⭐</span>
+          </div>
+          <div class="bet-input-wrap">
+            <input type="number" id="topupUzsInput" class="bet-input" value="30000" min="13000" step="1000" oninput="recalcUzsToStars()">
+            <span style="color:var(--text-muted);font-size:14px;font-weight:800;padding-right:8px">СУМ</span>
+          </div>
+          <div class="chip-row">
+            <button class="chip-btn" onclick="setTopupUzs(13000)">13k</button>
+            <button class="chip-btn" onclick="setTopupUzs(30000)">30k</button>
+            <button class="chip-btn" onclick="setTopupUzs(50000)">50k</button>
+            <button class="chip-btn" onclick="setTopupUzs(100000)">100k</button>
+            <button class="chip-btn" onclick="setTopupUzs(250000)">250k</button>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <div class="control-label">
+            <span>Чек перевода (скриншот):</span>
+            <span style="color:var(--text-muted)">PNG, JPG, PDF</span>
+          </div>
+          <div class="receipt-dropzone" onclick="document.getElementById('receiptFileInput').click()">
+            <div style="font-size:32px;margin-bottom:4px">🧾</div>
+            <div id="receiptFileLabel" style="font-size:13px;font-weight:700;color:var(--text-white)">
+              Нажмите, чтобы прикрепить скриншот чека
+            </div>
+            <div style="font-size:11px;color:var(--text-muted);margin-top:2px">После загрузки админ мгновенно начислит звёзды</div>
+          </div>
+          <input type="file" id="receiptFileInput" accept="image/*,.pdf" style="display:none" onchange="handleReceiptFileSelect(event)">
+        </div>
+
+        <button id="sendCardDepositBtn" class="main-action-btn" onclick="submitCardDeposit()">
+          <span>Отправить чек на проверку</span>
+        </button>
+      </div>
+
+      <!-- User's pending requests -->
+      <div id="userRequestsBox" style="margin-top:14px"></div>
+    </div>
+
+    <!-- METHOD 2: TELEGRAM GIFTS -->
+    <div id="pane-gift" class="topup-pane">
+      <div class="game-card">
+        <div style="text-align:center;padding:10px 0">
+          <div style="font-size:46px;margin-bottom:8px">🎁⭐</div>
+          <h4 style="font-size:16px;font-weight:800;color:var(--text-white);margin-bottom:6px">Пополнение через Telegram-подарки</h4>
+          <p style="font-size:12px;color:var(--text-muted);line-height:1.4">
+            Отправьте подарок от 15 звёзд администратору в личный Telegram.<br>
+            После получения подарка звёзды сразу начисляются на ваш игровой аккаунт!
+          </p>
+        </div>
+
+        <div class="control-group">
+          <div class="control-label">
+            <span>Количество звёзд в подарке:</span>
+            <span style="color:var(--accent-yellow)">Минимум: 15 ⭐</span>
+          </div>
+          <div class="bet-input-wrap">
+            <input type="number" id="giftStarsInput" class="bet-input" value="15" min="15">
+            <span style="color:var(--text-muted);font-size:14px;font-weight:800;padding-right:8px">⭐</span>
+          </div>
+        </div>
+
+        <button class="main-action-btn" onclick="openAdminTelegramForGift()">
+          <span>🎁 Отправить подарок в Telegram</span>
+        </button>
+
+        <button class="chip-btn" style="width:100%;padding:12px;margin-top:8px" onclick="submitGiftNotification()">
+          Я отправил подарок — уведомить админа
+        </button>
+      </div>
+    </div>
+
+  </section>
+
 </div>
 
+<!-- ── BOTTOM NAVIGATION ── -->
+<nav class="bottom-nav">
+  <button class="nav-btn active" id="nav-btn-games" onclick="switchNav('games')">
+    <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+    <span>Игры</span>
+  </button>
+  <button class="nav-btn" id="nav-btn-cases" onclick="switchNav('cases')">
+    <svg viewBox="0 0 24 24"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5M12 22V12"/></svg>
+    <span>Кейсы</span>
+  </button>
+  <button class="nav-btn" id="nav-btn-profile" onclick="switchNav('profile')">
+    <svg viewBox="0 0 24 24"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    <span>Профиль</span>
+  </button>
+  <button class="nav-btn" id="nav-btn-topup" onclick="switchNav('topup')">
+    <svg viewBox="0 0 24 24"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
+    <span>Пополнение</span>
+  </button>
+</nav>
+
+<!-- ── MODAL: CASE ROULETTE ── -->
+<div id="modalCaseRoulette" class="modal-overlay hidden">
+  <div class="modal-dialog">
+    <h3 id="modalCaseTitle" style="font-size:18px;font-weight:900;color:var(--text-white)">Открытие кейса</h3>
+    <div style="font-size:12px;color:var(--text-muted);margin-top:2px" id="modalCaseSub">Крутится рулетка...</div>
+
+    <div class="roulette-container">
+      <div class="roulette-pointer"></div>
+      <div class="roulette-reel" id="rouletteReel"></div>
+    </div>
+
+    <!-- Win Reveal Area -->
+    <div id="caseWinReveal" style="display:none;margin-top:14px;animation:fadeIn 0.3s ease">
+      <div id="caseWinIcon" style="font-size:60px">🧸</div>
+      <h4 id="caseWinName" style="font-size:18px;font-weight:900;color:var(--accent-yellow);margin-top:6px">Пляжный Мишка</h4>
+      <div id="caseWinBonusText" style="font-size:12px;color:var(--text-muted);margin:4px 0 14px 0">+300 LokoCoins зачислено</div>
+      <button class="main-action-btn" onclick="closeCaseModal()">Забрать в инвентарь</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── TOAST MESSAGE ── -->
+<div id="appToast" class="toast">Уведомление</div>
+
 <script>
-/* ── APP STATE & TELEGRAM ── */
-const tg = window.Telegram && window.Telegram.WebApp;
-try {
-  if (tg) {
-    tg.ready();
-    tg.expand();
-    tg.setHeaderColor && tg.setHeaderColor('#0d111d');
-    tg.setBackgroundColor && tg.setBackgroundColor('#0d111d');
-  }
-} catch (e) {}
+// ── Global State ─────────────────────────────────────────────────────────
+const tg = window.Telegram?.WebApp;
+if (tg) {
+  tg.expand();
+  tg.ready();
+}
 
-const U = (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) || { id: 999999, first_name: 'Игрок', username: 'player' };
-
-let AppState = {
+let currentUser = {
+  id: 0,
+  first_name: 'Игрок',
+  username: '',
   stars: 0,
-  coins: 0,
-  deposited: 0,
-  last_free: 0,
-  is_admin: false,
-  settings: {
-    card_number: '2200 7000 1234 5678',
-    card_holder: 'ИВАН И.',
-    card_bank: 'Сбербанк / Т-Банк',
-    rate_rub_to_star: 2.0
-  },
-  requests: []
+  coins: 500,
+  status: 'Гость',
+  inventory: [],
+  tap_score: 0,
+  tap_best: 0,
 };
 
-// UI helpers
-const $ = id => document.getElementById(id);
-function toast(msg) {
-  const t = $('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2600);
-}
+let appSettings = {
+  card_number: '5614 6812 5962 4009',
+  card_holder: 'Nafisa Xalimova',
+  card_bank: 'Uzcard / Humo',
+  rate_uzs_to_star: 2000,
+  min_uzs: 13000,
+  min_stars: 15,
+  admin_contact: 'merertd',
+};
 
-function updateUI() {
-  const sStr = (AppState.stars).toLocaleString('ru-RU');
-  $('topStarsDisplay').textContent = sStr;
-  document.querySelectorAll('.user-stars-val').forEach(el => el.textContent = sStr);
-  if ($('userCoinsVal')) $('userCoinsVal').textContent = (AppState.coins).toLocaleString('ru-RU');
-  
-  if (AppState.is_admin) {
-    $('userAvatar').textContent = 'ADM';
-    $('userAvatar').style.background = 'linear-gradient(135deg, #10b981, #059669)';
-  } else {
-    $('userAvatar').textContent = (U.first_name || 'U')[0].toUpperCase();
+// ── UI Navigation ────────────────────────────────────────────────────────
+function switchNav(tab) {
+  document.querySelectorAll('.tab-section').forEach(el => el.style.display = 'none');
+  document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+
+  const sec = document.getElementById(`sec-${tab}`);
+  const btn = document.getElementById(`nav-btn-${tab}`);
+  if (sec) sec.style.display = 'block';
+  if (btn) btn.classList.add('active');
+
+  if (tab === 'games') {
+    // Redraw canvases
+    drawUpgradeWheel();
   }
 }
 
-/* ── NAVIGATION ── */
-function navTo(tab) {
-  ['games', 'cases', 'earn', 'bonuses'].forEach(t => {
-    $('view-' + t).classList.toggle('hidden', t !== tab);
-  });
-  document.querySelectorAll('.nav-btn').forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.tab === tab);
-  });
-  window.scrollTo(0, 0);
+function selectGame(game) {
+  document.querySelectorAll('.game-sel-btn').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.game-view').forEach(el => el.classList.remove('active'));
+
+  const view = document.getElementById(`game-${game}`);
+  if (view) view.classList.add('active');
+
+  const idx = game === 'upgrade' ? 0 : game === 'rocket' ? 1 : 2;
+  const btns = document.querySelectorAll('.game-sel-btn');
+  if (btns[idx]) btns[idx].classList.add('active');
+
+  if (game === 'upgrade') {
+    setTimeout(drawUpgradeWheel, 50);
+  } else if (game === 'rocket') {
+    initRocketCanvas();
+  }
 }
 
-function openGame(g) {
-  if (g === 'storm') { openCaseModal('wanted'); return; }
-  $('screen-' + g).classList.remove('hidden');
-  if (g === 'chop') chopStart();
+function toast(msg) {
+  const el = document.getElementById('appToast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2600);
 }
 
-function closeScreen(s) {
-  $(s).classList.add('hidden');
-  if (s === 'screen-chop') chopStop();
-}
-
-function closeModal(m) {
-  $(m).classList.add('hidden');
-}
-
-/* ── SERVER SYNC & USER PROFILE ── */
-async function loadUserData() {
+// ── Fetch Initial State ──────────────────────────────────────────────────
+async function fetchUserState() {
   try {
+    const initData = tg?.initData || '';
     const res = await fetch('/api/user', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ init_data: tg ? tg.initData : '' })
+      body: JSON.stringify({ init_data: initData })
     });
     const d = await res.json();
-    if (d.ok && d.user) {
-      AppState.stars = d.user.stars;
-      AppState.coins = d.user.coins;
-      AppState.deposited = d.user.deposited;
-      AppState.last_free = d.user.last_free;
-      AppState.is_admin = d.user.is_admin;
-      if (d.settings) AppState.settings = d.settings;
-      if (d.deposit_requests) renderUserRequests(d.deposit_requests);
-      updateUI();
+    if (d.ok) {
+      currentUser = d.user;
+      appSettings = d.settings || appSettings;
+      renderUserData();
+      if (d.leaderboard) renderLeaderboard(d.leaderboard);
+      if (d.deposit_requests) renderDepositRequests(d.deposit_requests);
     }
   } catch (e) {
-    console.warn('Load user err:', e);
+    console.error('Fetch error:', e);
   }
 }
 
-async function saveStateDelta(starsDelta = 0, coinsDelta = 0) {
-  AppState.stars += starsDelta;
-  AppState.coins += coinsDelta;
-  updateUI();
+function renderUserData() {
+  document.getElementById('headerStars').textContent = currentUser.stars;
+  document.getElementById('headerCoins').textContent = currentUser.coins;
+
+  // Status banner
+  const stBadge = document.getElementById('topStatusBadge');
+  const stTitle = document.getElementById('topStatusTitle');
+  const stDesc = document.getElementById('topStatusDesc');
+  const status = currentUser.status || 'Гость';
+
+  stBadge.textContent = status;
+  stTitle.textContent = `Уровень: ${status}`;
+  
+  if (status === 'Элита') {
+    stDesc.textContent = 'Максимальный VIP-статус получен!';
+  } else if (status === 'Крутой') {
+    stDesc.textContent = 'До Элиты: пополните от 500 ⭐ (+250 ⭐ бонус)';
+  } else if (status === 'Местный') {
+    stDesc.textContent = 'До статуса Крутой: пополните от 150 ⭐ (+25 ⭐ бонус)';
+  } else {
+    stDesc.textContent = 'Пополните от 50 ⭐ для бонуса +500 🪙';
+  }
+
+  // Profile Section
+  document.getElementById('profUserName').textContent = currentUser.first_name || 'Игрок';
+  document.getElementById('profUserId').textContent = `ID: ${currentUser.id}`;
+  document.getElementById('profStatusName').textContent = status;
+
+  let progress = 15;
+  if (status === 'Местный') progress = 45;
+  else if (status === 'Крутой') progress = 75;
+  else if (status === 'Элита') progress = 100;
+  document.getElementById('profProgressBar').style.width = `${progress}%`;
+
+  // Referral link
+  const botUser = currentUser.bot_username || 'LokoCoins_Bot';
+  document.getElementById('refLinkInput').value = `https://t.me/${botUser}?start=ref_${currentUser.id}`;
+  document.getElementById('refCountText').textContent = `Друзей: ${currentUser.referral_count || 0}`;
+
+  // Top-up card details
+  document.getElementById('displayCardNum').textContent = appSettings.card_number;
+  document.getElementById('displayCardHolder').textContent = appSettings.card_holder;
+
+  // Inventory
+  renderInventory(currentUser.inventory || []);
+}
+
+function renderInventory(inv) {
+  const grid = document.getElementById('inventoryGrid');
+  document.getElementById('invCountText').textContent = `${inv.length} предм.`;
+
+  if (!inv.length) {
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--text-muted);font-size:13px">В инвентаре пока пусто. Открывайте кейсы, чтобы получать подарки и NFT!</div>';
+    return;
+  }
+
+  grid.innerHTML = inv.map(it => `
+    <div class="inv-item-card ${it.is_nft ? 'is-nft' : ''}">
+      ${it.is_nft ? '<div class="inv-item-nft-tag">NFT</div>' : ''}
+      <div class="inv-item-icon">${it.icon || '🎁'}</div>
+      <div class="inv-item-name">${it.name}</div>
+      <div class="inv-item-rarity">${it.rarity || 'Подарок'}</div>
+    </div>
+  `).join('');
+}
+
+// ═════════════════════════════════════════════════════════════════════════
+// ── GAME 1: UPGRADE (КОЛЕСО) ──
+// ═════════════════════════════════════════════════════════════════════════
+let upgMult = 2.0;
+let upgCurr = 'stars';
+let isWheelSpinning = false;
+
+function setUpgradeMult(m) {
+  if (isWheelSpinning) return;
+  upgMult = m;
+  document.querySelectorAll('.multi-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('wheelCenterMult').textContent = `${m}x`;
+  
+  const chance = Math.round((0.90 / m) * 100);
+  document.getElementById('upgradeWinChanceText').textContent = `Шанс: ${chance}%`;
+  drawUpgradeWheel();
+}
+
+function setUpgradeCurrency(c) {
+  upgCurr = c;
+  document.getElementById('upgCurrStars').classList.toggle('active', c === 'stars');
+  document.getElementById('upgCurrCoins').classList.toggle('active', c === 'coins');
+}
+
+function setUpgradeBet(val) {
+  document.getElementById('upgradeBetInput').value = val;
+}
+
+function drawUpgradeWheel() {
+  const canvas = document.getElementById('wheelCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const w = canvas.width;
+  const h = canvas.height;
+  const cx = w / 2;
+  const cy = h / 2;
+  const radius = cx - 4;
+
+  ctx.clearRect(0, 0, w, h);
+
+  // Win chance sector in degrees
+  const winFraction = 0.90 / upgMult;
+  const winAngle = winFraction * 2 * Math.PI;
+
+  // Background circle (Dark flame / orange zone)
+  ctx.beginPath();
+  ctx.arc(cx, cy, radius, 0, 2 * Math.PI);
+  ctx.fillStyle = '#ff3333';
+  ctx.fill();
+
+  // Winning Violet Sector (starting from -90deg / top or 0)
+  ctx.beginPath();
+  ctx.moveTo(cx, cy);
+  ctx.arc(cx, cy, radius, -Math.PI / 2, -Math.PI / 2 + winAngle);
+  ctx.closePath();
+  ctx.fillStyle = '#8b5cf6'; // Vivid Violet win zone
+  ctx.fill();
+
+  // Outer border with gold glow
+  ctx.beginPath();
+  ctx.arc(cx, cy, radius, 0, 2 * Math.PI);
+  ctx.lineWidth = 4;
+  ctx.strokeStyle = '#ffcc00';
+  ctx.stroke();
+}
+
+async function playUpgrade() {
+  if (isWheelSpinning) return;
+  const bet = parseInt(document.getElementById('upgradeBetInput').value) || 0;
+  if (bet <= 0) return toast('Укажите ставку');
+
+  const bal = upgCurr === 'stars' ? currentUser.stars : currentUser.coins;
+  if (bal < bet) return toast(`Недостаточно ${upgCurr === 'stars' ? 'звёзд' : 'монет'}`);
+
+  isWheelSpinning = true;
+  document.getElementById('upgradeSpinBtn').disabled = true;
+
   try {
-    await fetch('/api/save', {
+    const res = await fetch('/api/upgrade/play', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        init_data: tg ? tg.initData : '',
-        state: {
-          coins: AppState.coins,
-          stars_delta: starsDelta,
-          last_free: AppState.last_free
-        }
+        bet: bet,
+        currency: upgCurr,
+        multiplier: upgMult,
+        init_data: tg?.initData || ''
       })
     });
-  } catch (e) {}
+    const d = await res.json();
+    if (!d.ok) {
+      toast(d.error || 'Ошибка');
+      isWheelSpinning = false;
+      document.getElementById('upgradeSpinBtn').disabled = false;
+      return;
+    }
+
+    // Spin animation: rotate wheel by angle
+    const canvas = document.getElementById('wheelCanvas');
+    const extraRotations = 5 * 360;
+    const finalAngle = extraRotations + (360 - d.angle);
+
+    canvas.style.transition = 'transform 3.5s cubic-bezier(0.12, 0.8, 0.2, 1)';
+    canvas.style.transform = `rotate(${finalAngle}deg)`;
+
+    setTimeout(() => {
+      isWheelSpinning = false;
+      document.getElementById('upgradeSpinBtn').disabled = false;
+      canvas.style.transition = 'none';
+      canvas.style.transform = `rotate(${360 - d.angle}deg)`;
+
+      if (d.won) {
+        toast(`🎉 ВЫИГРЫШ! +${d.win_amount} ${upgCurr === 'stars' ? '⭐' : '🪙'}`);
+        if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+      } else {
+        toast('Стрелка не попала в зону. Попробуйте еще раз!');
+      }
+
+      if (upgCurr === 'stars') currentUser.stars = d.new_balance;
+      else currentUser.coins = d.new_balance;
+      renderUserData();
+    }, 3600);
+
+  } catch (e) {
+    isWheelSpinning = false;
+    document.getElementById('upgradeSpinBtn').disabled = false;
+    toast('Ошибка сервера');
+  }
 }
 
-/* ── TOP-UP & MANUAL RECEIPT SYSTEM ── */
-function openTopupModal() {
-  $('reqBankName').textContent = AppState.settings.card_bank || 'Сбербанк / Т-Банк';
-  $('reqCardNum').textContent = (AppState.settings.card_number || '2200 7000 1234 5678') + ' 📋';
-  $('reqCardHolder').textContent = AppState.settings.card_holder || 'ИВАН И.';
-  calcStarsFromRub();
-  $('modalTopup').classList.remove('hidden');
+// ═════════════════════════════════════════════════════════════════════════
+// ── GAME 2: ROCKET (CRASH) ──
+// ═════════════════════════════════════════════════════════════════════════
+let rockCurr = 'stars';
+let isRocketInFlight = false;
+let hasCashedOut = false;
+let rocketAnimFrame = null;
+let rocketCrashPoint = 1.0;
+let rocketCurrentMult = 1.0;
+let rocketBetAmount = 5;
+
+function setRocketCurrency(c) {
+  rockCurr = c;
+  document.getElementById('rockCurrStars').classList.toggle('active', c === 'stars');
+  document.getElementById('rockCurrCoins').classList.toggle('active', c === 'coins');
 }
 
-function calcStarsFromRub() {
-  const rub = parseInt($('topupAmountRub').value) || 0;
-  const rate = AppState.settings.rate_rub_to_star || 2.0;
-  const stars = Math.floor(rub / rate);
-  $('starsCalcPreview').textContent = `${stars.toLocaleString('ru-RU')} ⭐`;
+function setRocketBet(val) {
+  document.getElementById('rocketBetInput').value = val;
+}
+
+function initRocketCanvas() {
+  const canvas = document.getElementById('crashCanvas');
+  if (!canvas) return;
+  canvas.width = canvas.parentElement.clientWidth;
+  canvas.height = canvas.parentElement.clientHeight;
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
+
+async function toggleRocketFlight() {
+  const btn = document.getElementById('rocketLaunchBtn');
+
+  // Case A: Player is in flight and clicks «Забрать»
+  if (isRocketInFlight && !hasCashedOut) {
+    hasCashedOut = true;
+    const winAmount = Math.floor(rocketBetAmount * rocketCurrentMult);
+    btn.classList.remove('crash-cashout-btn');
+    btn.innerHTML = `<span>Выигрыш зафиксирован! (+${winAmount} ⭐)</span>`;
+    btn.disabled = true;
+
+    toast(`✅ Вы забрали ${rocketCurrentMult.toFixed(2)}x (+${winAmount} ${rockCurr === 'stars' ? '⭐' : '🪙'})!`);
+    if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+
+    // Notify server of cashout
+    fetch('/api/rocket/play', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        bet: rocketBetAmount,
+        currency: rockCurr,
+        cashout_at: rocketCurrentMult,
+        init_data: tg?.initData || ''
+      })
+    }).then(r => r.json()).then(d => {
+      if (d.ok) {
+        if (rockCurr === 'stars') currentUser.stars = d.new_balance;
+        else currentUser.coins = d.new_balance;
+        renderUserData();
+      }
+    });
+
+    // CRITICAL USER REQUIREMENT:
+    // "После того как игрок забрал выигрыш, ракета не должна останавливаться, 
+    // а продолжает лететь вверх и показывает, до какого множителя она бы долетела."
+    // Notice: we DO NOT cancel animation frame here! The loop keeps running until rocketCrashPoint!
+    return;
+  }
+
+  // Case B: Player clicks «Взлететь»
+  if (isRocketInFlight) return;
+
+  const bet = parseInt(document.getElementById('rocketBetInput').value) || 0;
+  if (bet <= 0) return toast('Укажите ставку');
+
+  const bal = rockCurr === 'stars' ? currentUser.stars : currentUser.coins;
+  if (bal < bet) return toast(`Недостаточно ${rockCurr === 'stars' ? 'звёзд' : 'монет'}`);
+
+  // Fetch crash point
+  try {
+    const res = await fetch('/api/rocket/play', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        bet: bet,
+        currency: rockCurr,
+        cashout_at: 0,
+        init_data: tg?.initData || ''
+      })
+    });
+    const d = await res.json();
+    if (!d.ok) return toast(d.error || 'Ошибка');
+
+    rocketCrashPoint = d.crash_point;
+    rocketBetAmount = bet;
+    isRocketInFlight = true;
+    hasCashedOut = false;
+    rocketCurrentMult = 1.00;
+
+    // Deduct bet from UI balance
+    if (rockCurr === 'stars') currentUser.stars -= bet;
+    else currentUser.coins -= bet;
+    renderUserData();
+
+    // Change button to «Забрать»
+    btn.classList.add('crash-cashout-btn');
+    btn.innerHTML = `<span>Забрать ${bet} ⭐</span>`;
+
+    runRocketAnimation();
+
+  } catch (e) {
+    toast('Ошибка запуска');
+  }
+}
+
+function runRocketAnimation() {
+  const canvas = document.getElementById('crashCanvas');
+  const ctx = canvas.getContext('2d');
+  const multText = document.getElementById('crashMultText');
+  const statusText = document.getElementById('crashStatusText');
+  const btn = document.getElementById('rocketLaunchBtn');
+
+  statusText.textContent = 'Ракета в полёте...';
+  statusText.style.color = '#ffcc00';
+
+  const startTime = performance.now();
+
+  function frame(now) {
+    const elapsed = (now - startTime) / 1000;
+    // Multiplier grows exponentially over time: 1.00 * e^(0.18 * elapsed)
+    rocketCurrentMult = Math.min(rocketCrashPoint, Math.pow(Math.E, 0.22 * elapsed));
+    multText.textContent = `${rocketCurrentMult.toFixed(2)}x`;
+
+    if (!hasCashedOut) {
+      const potentialWin = Math.floor(rocketBetAmount * rocketCurrentMult);
+      btn.innerHTML = `<span>Забрать ${potentialWin} ${rockCurr === 'stars' ? '⭐' : '🪙'}</span>`;
+    }
+
+    // Draw Rocket Trajectory Curve & Flame
+    const w = canvas.width;
+    const h = canvas.height;
+    ctx.clearRect(0, 0, w, h);
+
+    // Progress coordinates along arc
+    const maxFlightTime = Math.log(Math.max(1.1, rocketCrashPoint)) / 0.22;
+    const tProgress = Math.min(1.0, elapsed / Math.max(1.5, maxFlightTime));
+
+    const rx = 30 + (w - 70) * tProgress;
+    const ry = (h - 30) - (h - 70) * Math.pow(tProgress, 1.4);
+
+    // Grid Curve
+    ctx.beginPath();
+    ctx.moveTo(30, h - 30);
+    ctx.quadraticCurveTo(w * 0.4, h - 30, rx, ry);
+    ctx.strokeStyle = hasCashedOut ? '#10b981' : '#ff7700';
+    ctx.lineWidth = 4;
+    ctx.stroke();
+
+    // Rocket Emoji / Drawing
+    ctx.font = '28px sans-serif';
+    ctx.fillText('🚀', rx - 14, ry + 10);
+
+    // Check if crashed
+    if (rocketCurrentMult >= rocketCrashPoint) {
+      // BUST!
+      statusText.textContent = `💥 ВЗРЫВ НА ${rocketCrashPoint.toFixed(2)}x`;
+      statusText.style.color = '#ff3333';
+      multText.textContent = `${rocketCrashPoint.toFixed(2)}x`;
+
+      isRocketInFlight = false;
+      btn.classList.remove('crash-cashout-btn');
+      btn.disabled = false;
+      btn.innerHTML = `<span>Взлететь 🚀</span>`;
+
+      if (!hasCashedOut) {
+        toast('Ракета взорвалась!');
+        if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('error');
+      }
+      return;
+    }
+
+    rocketAnimFrame = requestAnimationFrame(frame);
+  }
+
+  rocketAnimFrame = requestAnimationFrame(frame);
+}
+
+// ═════════════════════════════════════════════════════════════════════════
+// ── GAME 3: TAP GAME (ТАПАЛКА) ──
+// ═════════════════════════════════════════════════════════════════════════
+let sessionTapCount = 0;
+let tapSyncTimer = null;
+
+function handleCoinTap(e) {
+  sessionTapCount++;
+  document.getElementById('tapCurrentScore').textContent = sessionTapCount;
+
+  // Haptic
+  if (tg?.HapticFeedback) {
+    tg.HapticFeedback.impactOccurred('light');
+  }
+
+  // Floating score particle
+  const coin = document.getElementById('tapCoinElement');
+  const rect = coin.getBoundingClientRect();
+  const particle = document.createElement('div');
+  particle.className = 'tap-floating-number';
+  particle.textContent = '+1';
+
+  const clientX = e.clientX || (rect.left + rect.width / 2);
+  const clientY = e.clientY || (rect.top + rect.height / 2);
+
+  particle.style.left = `${clientX - 15 + (Math.random() * 20 - 10)}px`;
+  particle.style.top = `${clientY - 30}px`;
+  document.body.appendChild(particle);
+
+  setTimeout(() => particle.remove(), 800);
+
+  // Debounced sync with server
+  clearTimeout(tapSyncTimer);
+  tapSyncTimer = setTimeout(() => {
+    fetch('/api/tap/submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        score: sessionTapCount,
+        init_data: tg?.initData || ''
+      })
+    }).then(r => r.json()).then(d => {
+      if (d.ok && d.leaderboard) {
+        renderLeaderboard(d.leaderboard);
+      }
+    });
+  }, 1000);
+}
+
+function renderLeaderboard(leaders) {
+  const container = document.getElementById('tapLeaderboardRows');
+  if (!container) return;
+  if (!leaders.length) {
+    container.innerHTML = '<div style="text-align:center;padding:10px;font-size:12px;color:var(--text-muted)">Тапайте по монете, чтобы войти в топ!</div>';
+    return;
+  }
+
+  container.innerHTML = leaders.map(l => `
+    <div class="leader-row">
+      <div class="leader-rank">${l.rank === 1 ? '🥇' : l.rank === 2 ? '🥈' : l.rank === 3 ? '🥉' : '#' + l.rank}</div>
+      <div class="leader-name">${l.name}</div>
+      <div class="leader-score">${l.score}</div>
+      ${l.reward ? `<div class="leader-reward">${l.reward}</div>` : ''}
+    </div>
+  `).join('');
+}
+
+// ═════════════════════════════════════════════════════════════════════════
+// ── SECTION 2: CASES & ROULETTE ──
+// ═════════════════════════════════════════════════════════════════════════
+let isCaseOpening = false;
+
+async function openCaseModal(caseId) {
+  if (isCaseOpening) return;
+  const modal = document.getElementById('modalCaseRoulette');
+  const reel = document.getElementById('rouletteReel');
+  const reveal = document.getElementById('caseWinReveal');
+  const title = document.getElementById('modalCaseTitle');
+  const sub = document.getElementById('modalCaseSub');
+
+  const names = {
+    beach: 'Пляжный кейс (15 ⭐)',
+    gift: 'Подарочный кейс (20 ⭐)',
+    rare: 'Редкий кейс (25 ⭐)',
+    elite: 'Элитный кейс (50 ⭐)',
+  };
+
+  title.textContent = names[caseId] || 'Открытие кейса';
+  sub.textContent = 'Крутится рулетка...';
+  reveal.style.display = 'none';
+  reel.style.transition = 'none';
+  reel.style.transform = 'translateX(0px)';
+  modal.classList.remove('hidden');
+  isCaseOpening = true;
+
+  try {
+    const res = await fetch('/api/case/open', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        case_id: caseId,
+        init_data: tg?.initData || ''
+      })
+    });
+    const d = await res.json();
+    if (!d.ok) {
+      toast(d.error || 'Ошибка открытия');
+      modal.classList.add('hidden');
+      isCaseOpening = false;
+      return;
+    }
+
+    // Render reel items
+    reel.innerHTML = d.reel.map(item => `
+      <div class="roulette-item ${item.is_nft ? 'nft' : ''}">
+        <div class="roulette-item-icon">${item.icon || '🎁'}</div>
+        <div class="roulette-item-name">${item.name}</div>
+      </div>
+    `).join('');
+
+    // Animate reel
+    const itemWidth = 90;
+    const stopOffset = (d.stop_index * itemWidth) - (reel.parentElement.clientWidth / 2) + (itemWidth / 2);
+
+    setTimeout(() => {
+      reel.style.transition = 'transform 4.8s cubic-bezier(0.1, 0.85, 0.2, 1)';
+      reel.style.transform = `translateX(-${stopOffset}px)`;
+    }, 50);
+
+    setTimeout(() => {
+      isCaseOpening = false;
+      sub.textContent = 'Выпал предмет:';
+      document.getElementById('caseWinIcon').textContent = d.item.icon || '🎁';
+      document.getElementById('caseWinName').textContent = d.item.name;
+      document.getElementById('caseWinBonusText').textContent = `+${d.bonus_coins} LokoCoins начислено на баланс!`;
+      reveal.style.display = 'block';
+
+      if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+
+      currentUser.stars = d.new_stars;
+      currentUser.coins = d.new_coins;
+      currentUser.inventory.unshift(d.item);
+      renderUserData();
+    }, 5000);
+
+  } catch (e) {
+    isCaseOpening = false;
+    modal.classList.add('hidden');
+    toast('Ошибка сервера');
+  }
+}
+
+function closeCaseModal() {
+  document.getElementById('modalCaseRoulette').classList.add('hidden');
+}
+
+// ═════════════════════════════════════════════════════════════════════════
+// ── SECTION 3: PROFILE (PROMO & REFERRAL) ──
+// ═════════════════════════════════════════════════════════════════════════
+function copyRefLink() {
+  const input = document.getElementById('refLinkInput');
+  input.select();
+  navigator.clipboard.writeText(input.value);
+  toast('Реферальная ссылка скопирована!');
+}
+
+async function applyPromoCode() {
+  const input = document.getElementById('promoCodeInput');
+  const code = input.value.trim().toUpperCase();
+  if (!code) return toast('Введите промокод');
+
+  try {
+    const res = await fetch('/api/promo/apply', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code: code, init_data: tg?.initData || '' })
+    });
+    const d = await res.json();
+    if (d.ok) {
+      toast(d.message);
+      currentUser.stars = d.stars;
+      currentUser.coins = d.coins;
+      input.value = '';
+      renderUserData();
+    } else {
+      toast(d.error || 'Ошибка активации');
+    }
+  } catch (e) {
+    toast('Ошибка связи');
+  }
+}
+
+// ═════════════════════════════════════════════════════════════════════════
+// ── SECTION 4: TOP-UP (КАРТА И ПОДАРКИ) ──
+// ═════════════════════════════════════════════════════════════════════════
+let selectedReceiptFile = null;
+
+function switchTopupMethod(method) {
+  document.getElementById('btnMethodCard').classList.toggle('active', method === 'card');
+  document.getElementById('btnMethodGift').classList.toggle('active', method === 'gift');
+  document.getElementById('pane-card').classList.toggle('active', method === 'card');
+  document.getElementById('pane-gift').classList.toggle('active', method === 'gift');
 }
 
 function copyCardNumber() {
-  const num = (AppState.settings.card_number || '').replace(/\s+/g, '');
-  if (navigator.clipboard) {
-    navigator.clipboard.writeText(num);
-    toast('Номер карты скопирован');
-  } else {
-    toast(num);
+  navigator.clipboard.writeText(appSettings.card_number.replace(/\s+/g, ''));
+  toast('Номер карты скопирован!');
+}
+
+function recalcUzsToStars() {
+  const uzs = parseInt(document.getElementById('topupUzsInput').value) || 0;
+  const stars = Math.floor(uzs / (appSettings.rate_uzs_to_star || 2000));
+  document.getElementById('calcStarsPreview').textContent = `Вы получите: ${stars} ⭐`;
+}
+
+function setTopupUzs(val) {
+  document.getElementById('topupUzsInput').value = val;
+  recalcUzsToStars();
+}
+
+function handleReceiptFileSelect(e) {
+  const file = e.target.files[0];
+  if (file) {
+    selectedReceiptFile = file;
+    document.getElementById('receiptFileLabel').textContent = `Выбран файл: ${file.name}`;
+    toast('Чек прикреплен!');
   }
 }
 
-let selectedReceiptFile = null;
-function onReceiptSelected(input) {
-  if (input.files && input.files[0]) {
-    selectedReceiptFile = input.files[0];
-    $('uploadStatusText').textContent = `Выбран файл: ${selectedReceiptFile.name}`;
-    $('uploadStatusText').style.color = '#38bdf8';
-  }
-}
+async function submitCardDeposit() {
+  const uzs = parseInt(document.getElementById('topupUzsInput').value) || 0;
+  if (uzs < 13000) return toast('Минимальное пополнение — 13 000 сум');
+  if (!selectedReceiptFile) return toast('Пожалуйста, прикрепите скриншот чека!');
 
-async function submitDepositRequest() {
-  const rub = parseInt($('topupAmountRub').value) || 0;
-  if (rub < 50) { toast('Минимальная сумма — 50 ₽'); return; }
-  if (!selectedReceiptFile) { toast('Пожалуйста, прикрепите скриншот чека'); return; }
-
-  const btn = $('btnSubmitReceipt');
+  const btn = document.getElementById('sendCardDepositBtn');
   btn.disabled = true;
   btn.textContent = 'Отправка...';
 
   const formData = new FormData();
-  formData.append('init_data', tg ? tg.initData : '');
-  formData.append('amount_rub', rub);
+  formData.append('amount_uzs', uzs);
   formData.append('receipt', selectedReceiptFile);
+  formData.append('method', 'card');
+  formData.append('init_data', tg?.initData || '');
 
   try {
     const res = await fetch('/api/deposit/create', {
       method: 'POST',
       body: formData
     });
-    const data = await res.json();
+    const d = await res.json();
     btn.disabled = false;
     btn.textContent = 'Отправить чек на проверку';
 
-    if (data.ok) {
-      closeModal('modalTopup');
+    if (d.ok) {
+      toast('Чек отправлен! Администратор проверит и начислит звёзды.');
       selectedReceiptFile = null;
-      $('uploadStatusText').textContent = 'Нажмите, чтобы выбрать чек об оплате';
-      toast('Заявка создана! Ожидает проверки');
-      loadUserData();
-      navTo('bonuses');
+      document.getElementById('receiptFileLabel').textContent = 'Нажмите, чтобы прикрепить скриншот чека';
+      fetchUserState();
     } else {
-      toast(data.error || 'Ошибка отправки');
+      toast(d.error || 'Ошибка отправки');
     }
-  } catch (err) {
+  } catch (e) {
     btn.disabled = false;
     btn.textContent = 'Отправить чек на проверку';
-    toast('Ошибка соединения');
+    toast('Ошибка сервера');
   }
 }
 
-function renderUserRequests(list) {
-  const box = $('userDepositRequestsList');
-  if (!list || !list.length) {
-    box.innerHTML = '<div style="font-size:13px;color:var(--text-muted);text-align:center;padding:20px">Заявок пока нет</div>';
-    return;
+function openAdminTelegramForGift() {
+  const admin = appSettings.admin_contact || 'merertd';
+  window.open(`https://t.me/${admin}`, '_blank');
+}
+
+async function submitGiftNotification() {
+  const stars = parseInt(document.getElementById('giftStarsInput').value) || 15;
+  const formData = new FormData();
+  formData.append('stars', stars);
+  formData.append('method', 'gift');
+  formData.append('init_data', tg?.initData || '');
+
+  try {
+    const res = await fetch('/api/deposit/create', { method: 'POST', body: formData });
+    const d = await res.json();
+    if (d.ok) {
+      toast('Заявка создана! Администратор проверит входящий подарок в TG.');
+      fetchUserState();
+    }
+  } catch (e) {
+    toast('Ошибка связи');
   }
-  box.innerHTML = list.map(r => `
-    <div class="card-box" style="margin-bottom:8px;padding:12px">
-      <div style="display:flex;justify-content:space-between;align-items:center">
+}
+
+function renderDepositRequests(reqs) {
+  const box = document.getElementById('userRequestsBox');
+  if (!box || !reqs.length) return;
+
+  box.innerHTML = `
+    <div style="font-size:13px;font-weight:800;color:var(--text-white);margin-bottom:8px">История заявок:</div>
+    ${reqs.map(r => `
+      <div style="background:var(--card-inner);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:10px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;font-size:12px">
         <div>
-          <b>Заявка #${r.id}</b>
-          <div style="font-size:12px;color:var(--text-muted)">${r.amount_rub} ₽ → +${r.stars} ⭐</div>
+          <div><b>Заявка #${r.id}</b> (${r.stars} ⭐)</div>
+          <div style="color:var(--text-muted);font-size:11px">${r.method === 'gift' ? 'Подарок TG' : (r.amount_uzs || 0).toLocaleString() + ' сум'}</div>
         </div>
-        <div>
-          <span class="status-badge status-${r.status}">
-            ${r.status === 'pending' ? 'На проверке' : r.status === 'approved' ? 'Зачислено' : 'Отклонено'}
-          </span>
+        <div style="font-weight:800;color:${r.status === 'approved' ? 'var(--success)' : r.status === 'rejected' ? 'var(--danger)' : 'var(--warning)'}">
+          ${r.status === 'approved' ? 'Одобрено' : r.status === 'rejected' ? 'Отклонено' : 'Проверяется'}
         </div>
       </div>
-    </div>
-  `).join('');
+    `).join('')}
+  `;
 }
 
-/* ── ADMIN PANEL ── */
-function openProfileModal() {
-  if (AppState.is_admin) {
-    openAdminPanel();
-  } else {
-    toast(`Вы вошли как ${U.first_name} (ID: ${U.id})`);
-  }
-}
-
-async function openAdminPanel() {
-  $('modalAdmin').classList.remove('hidden');
-  $('admCardNum').value = AppState.settings.card_number || '';
-  $('admCardHolder').value = AppState.settings.card_holder || '';
-  $('admCardBank').value = AppState.settings.card_bank || '';
-  $('admRate').value = AppState.settings.rate_rub_to_star || 2.0;
-
-  try {
-    const res = await fetch('/api/admin/requests', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ init_data: tg ? tg.initData : '' })
-    });
-    const d = await res.json();
-    if (d.ok) {
-      $('admReqsCount').textContent = d.requests.length;
-      renderAdminRequests(d.requests);
-    }
-  } catch (e) {}
-}
-
-function renderAdminRequests(list) {
-  const box = $('adminRequestsList');
-  if (!list.length) {
-    box.innerHTML = '<div style="color:var(--text-muted);font-size:13px;text-align:center;padding:15px">Нет активных заявок</div>';
-    return;
-  }
-  box.innerHTML = list.map(r => `
-    <div class="admin-req-card">
-      <div class="admin-req-head">
-        <b>Заявка #${r.id}</b>
-        <span class="status-badge status-${r.status}">${r.status}</span>
-      </div>
-      <div style="font-size:13px">
-        Игрок: <b>${r.first_name || r.telegram_id}</b> (@${r.username || '-'})<br>
-        Сумма: <b style="color:#fbbf24">${r.amount_rub} ₽</b> → <b style="color:#38bdf8">${r.stars} ⭐</b>
-      </div>
-      <div style="margin:8px 0">
-        <a href="/uploads/${r.receipt_file}" target="_blank" style="color:var(--star);font-size:12px;font-weight:800;text-decoration:none">
-          🔍 Посмотреть прикреплённый чек
-        </a>
-      </div>
-      ${r.status === 'pending' ? `
-        <div class="admin-btns">
-          <button class="btn-approve" onclick="processAdminReq(${r.id}, 'approve')">Одобрить (+${r.stars} ⭐)</button>
-          <button class="btn-reject" onclick="processAdminReq(${r.id}, 'reject')">Отклонить</button>
-        </div>
-      ` : ''}
-    </div>
-  `).join('');
-}
-
-async function processAdminReq(id, action) {
-  try {
-    const res = await fetch('/api/admin/process', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ init_data: tg ? tg.initData : '', request_id: id, action: action })
-    });
-    const d = await res.json();
-    if (d.ok) {
-      toast(d.message);
-      openAdminPanel();
-      loadUserData();
-    } else {
-      toast(d.error || 'Ошибка');
-    }
-  } catch (e) { toast('Ошибка связи'); }
-}
-
-async function saveAdminSettings() {
-  try {
-    const res = await fetch('/api/admin/settings', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        init_data: tg ? tg.initData : '',
-        card_number: $('admCardNum').value,
-        card_holder: $('admCardHolder').value,
-        card_bank: $('admCardBank').value,
-        rate_rub_to_star: $('admRate').value
-      })
-    });
-    const d = await res.json();
-    if (d.ok) {
-      AppState.settings = d.settings;
-      toast('Реквизиты сохранены');
-    }
-  } catch (e) { toast('Ошибка сохранения'); }
-}
-
-/* ── CASE ROULETTE ── */
-const CASES_DATA = {
-  vice: { name: 'Вайс-Сити', price: 1, prizes: [0.5, 1, 2, 5, 10] },
-  wanted: { name: 'Розыск', price: 2.5, prizes: [1, 2.5, 5, 15, 25] },
-  safe: { name: 'Сейф Мафии', price: 5, prizes: [2, 5, 10, 25, 50] },
-  lowrider: { name: 'Лоурайдер', price: 10, prizes: [5, 10, 20, 50, 100] }
-};
-
-let currentCase = null;
-let isSpinning = false;
-
-function openCaseModal(caseKey) {
-  currentCase = CASES_DATA[caseKey];
-  if (!currentCase) return;
-  if (AppState.stars < currentCase.price) {
-    toast(`Не хватает звёзд (${currentCase.price} ⭐). Пополните баланс!`);
-    openTopupModal();
-    return;
-  }
-
-  $('crlCaseName').textContent = `Кейс «${currentCase.name}» (${currentCase.price} ⭐)`;
-  $('crlWonBox').classList.add('hidden');
-  $('btnCrlClaim').disabled = true;
-
-  // Render items
-  const track = $('crlTrack');
-  const wonPrize = currentCase.prizes[Math.floor(Math.random() * currentCase.prizes.length)];
-  let itemsHtml = '';
-  const TARGET_INDEX = 28;
-  for (let i = 0; i < 35; i++) {
-    const p = (i === TARGET_INDEX) ? wonPrize : currentCase.prizes[Math.floor(Math.random() * currentCase.prizes.length)];
-    itemsHtml += `
-      <div class="roulette-item">
-        <span style="font-size:24px">💎</span>
-        <span>+${p} ⭐</span>
-      </div>
-    `;
-  }
-  track.style.transition = 'none';
-  track.style.transform = 'translateX(0)';
-  track.innerHTML = itemsHtml;
-
-  $('modalCaseRoulette').classList.remove('hidden');
-
-  // Charge stars & spin
-  saveStateDelta(-currentCase.price);
-
-  setTimeout(() => {
-    const itemW = 98; // 90 width + 8 margin
-    const targetOffset = -(TARGET_INDEX * itemW - 150);
-    track.style.transition = 'transform 3.8s cubic-bezier(0.12, 0.8, 0.2, 1)';
-    track.style.transform = `translateX(${targetOffset}px)`;
-  }, 100);
-
-  setTimeout(() => {
-    $('crlWonText').textContent = `+${wonPrize} ⭐`;
-    $('crlWonBox').classList.remove('hidden');
-    $('btnCrlClaim').disabled = false;
-    saveStateDelta(wonPrize);
-  }, 4100);
-}
-
-function openFreeCase() {
-  const left = (AppState.last_free || 0) + 864e5 - Date.now();
-  if (left > 0) {
-    toast('Кейс доступен раз в 24 часа!');
-    return;
-  }
-  AppState.last_free = Date.now();
-  saveStateDelta(1, 100); // 1 звезда и 100 коинов
-  toast('Ежедневный приз: +1 ⭐ и +100 🪙!');
-}
-
-/* ── GAME: ROCKET (CRASH) ── */
-let Rkt = { bet: 1, active: false, mult: 1, crash: 2, raf: null, t0: 0 };
-
-function setRBet(b) {
-  if (Rkt.active) return;
-  Rkt.bet = b;
-  document.querySelectorAll('.chip-rbet').forEach(c => c.classList.toggle('active', c.textContent.includes(b + ' ')));
-}
-
-function rocketStart() {
-  if (Rkt.active) return;
-  if (AppState.stars < Rkt.bet) { toast('Не хватает звёзд!'); openTopupModal(); return; }
-  saveStateDelta(-Rkt.bet);
-
-  Rkt.active = true;
-  Rkt.mult = 1.0;
-  Rkt.t0 = performance.now();
-  Rkt.crash = Math.min(25, Math.max(1.05, 0.96 / (1 - Math.random())));
-
-  $('btnRktGo').disabled = true;
-  $('btnRktCash').disabled = false;
-  $('btnRktCash').textContent = `Забрать ${(Rkt.bet * Rkt.mult).toFixed(1)} ⭐`;
-
-  const sprite = $('rktSprite');
-  sprite.style.bottom = '25px';
-
-  function loop(now) {
-    if (!Rkt.active) return;
-    Rkt.mult = Math.exp(0.16 * (now - Rkt.t0) / 1000);
-    if (Rkt.mult >= Rkt.crash) {
-      rocketExplode();
-      return;
-    }
-    $('rktMult').textContent = Rkt.mult.toFixed(2) + 'x';
-    $('btnRktCash').textContent = `Забрать ${(Rkt.bet * Rkt.mult).toFixed(1)} ⭐`;
-    sprite.style.bottom = Math.min(130, 25 + (Rkt.mult - 1) * 20) + 'px';
-    Rkt.raf = requestAnimationFrame(loop);
-  }
-  Rkt.raf = requestAnimationFrame(loop);
-}
-
-function rocketExplode() {
-  Rkt.active = false;
-  cancelAnimationFrame(Rkt.raf);
-  $('rktMult').textContent = 'ВЗРЫВ!';
-  $('btnRktGo').disabled = false;
-  $('btnRktCash').disabled = true;
-  toast(`Ракета взорвалась на x${Rkt.crash.toFixed(2)}`);
-}
-
-function rocketCashout() {
-  if (!Rkt.active) return;
-  Rkt.active = false;
-  cancelAnimationFrame(Rkt.raf);
-  const win = parseFloat((Rkt.bet * Rkt.mult).toFixed(1));
-  saveStateDelta(win);
-  $('btnRktGo').disabled = false;
-  $('btnRktCash').disabled = true;
-  toast(`Вы забрали +${win} ⭐ (x${Rkt.mult.toFixed(2)})!`);
-}
-
-/* ── GAME: UPGRADE ── */
-let Upg = { amt: 1, mult: 1.5, spinning: false, rot: 0 };
-
-function setUpgAmt(a) {
-  if (Upg.spinning) return;
-  Upg.amt = a;
-  document.querySelectorAll('.upg-amt').forEach(c => c.classList.toggle('active', c.textContent.includes(a + ' ')));
-  updateUpgArc();
-}
-
-function setUpgMult(m) {
-  if (Upg.spinning) return;
-  Upg.mult = m;
-  document.querySelectorAll('.upg-mult').forEach(c => c.classList.toggle('active', c.textContent.includes('x' + m)));
-  updateUpgArc();
-}
-
-function updateUpgArc() {
-  const chance = Math.round(90 / Upg.mult);
-  $('upgChanceText').textContent = chance + '%';
-  const C = 2 * Math.PI * 80;
-  $('upgArc').setAttribute('stroke-dasharray', `${(chance / 100) * C} ${C}`);
-}
-
-function spinUpgrade() {
-  if (Upg.spinning) return;
-  if (AppState.stars < Upg.amt) { toast('Не хватает звёзд!'); openTopupModal(); return; }
-  saveStateDelta(-Upg.amt);
-
-  Upg.spinning = true;
-  $('btnUpgSpin').disabled = true;
-
-  const chance = Math.round(90 / Upg.mult);
-  const isWin = (Math.random() * 100) < chance;
-  const targetAngle = isWin ? (Math.random() * (chance * 3.6)) : (chance * 3.6 + Math.random() * (360 - chance * 3.6));
-  const fullRotations = 5 * 360;
-  const finalRot = Upg.rot + fullRotations + targetAngle;
-  Upg.rot = finalRot;
-
-  $('upgPointer').style.transition = 'transform 4.5s cubic-bezier(0.12, 0.8, 0.2, 1)';
-  $('upgPointer').setAttribute('transform', `rotate(${finalRot} 100 100)`);
-
-  setTimeout(() => {
-    Upg.spinning = false;
-    $('btnUpgSpin').disabled = false;
-    if (isWin) {
-      const win = Math.round(Upg.amt * Upg.mult);
-      saveStateDelta(win);
-      toast(`Успех! Ставка умножена: +${win} ⭐`);
-    } else {
-      toast('Не повезло! Ставка сгорела.');
-    }
-  }, 4700);
-}
-
-/* ── GAME: CHOPPER ── */
-let Chop = { ang: 0, lvl: 1, combo: 1, raf: null, last: 0 };
-
-function chopStart() {
-  chopStop();
-  Chop.last = performance.now();
-  function f(now) {
-    Chop.ang = (Chop.ang + (now - Chop.last) * 0.28) % 360;
-    Chop.last = now;
-    $('chNeedle').setAttribute('transform', `rotate(${Chop.ang} 100 100)`);
-    Chop.raf = requestAnimationFrame(f);
-  }
-  Chop.raf = requestAnimationFrame(f);
-}
-
-function chopStop() { cancelAnimationFrame(Chop.raf); }
-
-function chopHit() {
-  const diff = Math.min(Chop.ang, 360 - Chop.ang);
-  if (diff <= 25) {
-    Chop.combo = Math.min(9, Chop.combo + 1);
-    const reward = 5 * Chop.lvl * Chop.combo;
-    saveStateDelta(0, reward);
-    $('chStatus').innerHTML = `<span style="color:#34d399">Точно в цель! +${reward} 🪙</span>`;
-  } else {
-    Chop.combo = 1;
-    $('chStatus').innerHTML = `<span style="color:#f87171">Промах! Комбо сброшено</span>`;
-  }
-  $('chCombo').textContent = Chop.combo;
-}
-
-/* ── PROMO & REFERRAL ── */
-async function applyPromo() {
-  const code = $('promoInput').value.trim().toUpperCase();
-  if (!code) return;
-  if (code === 'RUBUP' || code === 'LOGO10') {
-    saveStateDelta(5, 500);
-    toast('Промокод активирован! +5 ⭐ и +500 🪙');
-    $('promoInput').value = '';
-  } else {
-    toast('Неверный или устаревший промокод');
-  }
-}
-
-function copyRefLink() {
-  const link = `https://t.me/${BOT_USERNAME}?start=ref_${U.id}`;
-  if (navigator.clipboard) {
-    navigator.clipboard.writeText(link);
-    toast('Реферальная ссылка скопирована!');
-  } else {
-    toast(link);
-  }
-}
-
-/* ── START INIT ── */
-loadUserData();
-updateUpgArc();
+// ── Startup ──────────────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  fetchUserState();
+  drawUpgradeWheel();
+  initRocketCanvas();
+});
 </script>
+
 </body>
 </html>
