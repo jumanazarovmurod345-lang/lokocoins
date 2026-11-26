@@ -116,6 +116,14 @@ web = Flask(__name__, static_folder=None)
 web.config["MAX_CONTENT_LENGTH"] = 16 * 1024 * 1024
 
 
+@web.after_request
+def add_cache_headers(response):
+    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate, max-age=0"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "0"
+    return response
+
+
 @web.get("/")
 def home():
     return send_from_directory(WEB_DIR, "index.html")
@@ -843,8 +851,9 @@ def run_web():
 def get_main_keyboard():
     rows = []
     if WEBAPP_URL.startswith("https://"):
+        target_url = f"{WEBAPP_URL}?v=21"
         rows.append([
-            InlineKeyboardButton("🚀 Открыть LokoCoins", web_app=WebAppInfo(url=WEBAPP_URL))
+            InlineKeyboardButton("🚀 Открыть LokoCoins", web_app=WebAppInfo(url=target_url))
         ])
     else:
         rows.append([
@@ -870,11 +879,12 @@ async def cmd_start(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
 
     if WEBAPP_URL.startswith("https://"):
         try:
+            target_url = f"{WEBAPP_URL}?v=21"
             await ctx.bot.set_chat_menu_button(
                 chat_id=user.id,
                 menu_button=MenuButtonWebApp(
                     text="🎮 ИГРАТЬ",
-                    web_app=WebAppInfo(url=WEBAPP_URL)
+                    web_app=WebAppInfo(url=target_url)
                 )
             )
         except Exception as e:
