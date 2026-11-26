@@ -908,6 +908,32 @@ async def cmd_start(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     )
 
 
+async def cmd_admin(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
+    user = update.effective_user
+    msg = update.effective_message
+    if not is_admin(user.id):
+        await msg.reply_text("⛔ У вас нет прав администратора.")
+        return
+
+    pending = db.get_all_deposit_requests("pending")
+    withdraws = db.get_all_withdraw_requests()
+    users_count = len(db.get_all_users())
+
+    text = (
+        f"👑 <b>Панель Администратора LokoCoins</b>\n\n"
+        f"👥 Всего игроков: <b>{users_count}</b>\n"
+        f"🧾 Ожидают проверки чеков: <b>{len(pending)}</b>\n"
+        f"🎁 Заявок на вывод подарков: <b>{len(withdraws)}</b>\n\n"
+        f"Нажмите кнопку ниже, чтобы открыть панель управления:"
+    )
+
+    target_url = f"{WEBAPP_URL}?v=22" if WEBAPP_URL.startswith("https://") else "https://t.me"
+    kb = InlineKeyboardMarkup([
+        [InlineKeyboardButton("👑 Открыть Админку", web_app=WebAppInfo(url=target_url))]
+    ])
+    await msg.reply_text(text, reply_markup=kb, parse_mode="HTML")
+
+
 def main():
     global bot_app, bot_loop
 
@@ -921,6 +947,7 @@ def main():
     logging.info("Starting Telegram Bot...")
     bot_app = Application.builder().token(TOKEN).build()
     bot_app.add_handler(CommandHandler("start", cmd_start))
+    bot_app.add_handler(CommandHandler("admin", cmd_admin))
 
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)

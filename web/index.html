@@ -1197,6 +1197,11 @@
       <div class="brand-title">Loko<span>Coins</span></div>
     </div>
     <div class="header-actions">
+      <!-- Direct Admin Crown Button (Visible to Admin on all tabs) -->
+      <button id="topAdminCrownBtn" style="display:none;background:var(--gradient-flame);border:none;border-radius:14px;padding:6px 10px;font-size:14px;cursor:pointer;box-shadow:var(--glow-orange);color:#fff;font-weight:900" onclick="openAdminModal()" title="Админ-панель">
+        👑 Админка
+      </button>
+
       <div class="balance-pill stars" onclick="switchNav('topup')">
         <span>⭐</span>
         <span id="headerStars">0</span>
@@ -1577,6 +1582,22 @@
         <button id="adminPanelOpenBtn" style="display:none;margin-left:auto;background:var(--accent-orange);color:#fff;border:none;border-radius:10px;padding:6px 12px;font-size:11px;font-weight:900;cursor:pointer" onclick="openAdminModal()">
           ⚙️ Админка
         </button>
+      </div>
+
+      <!-- Big Prominent Admin Banner for Owner -->
+      <div id="adminPanelBanner" style="display:none;background:linear-gradient(135deg, #ff4400 0%, #b30000 100%);border:2px solid #ffaa00;border-radius:16px;padding:14px 16px;margin-bottom:14px;cursor:pointer;box-shadow:0 6px 20px rgba(255,85,0,0.4)" onclick="openAdminModal()">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="font-size:32px">👑</div>
+            <div>
+              <div style="font-size:16px;font-weight:900;color:#fff">Панель Администратора</div>
+              <div style="font-size:11px;color:rgba(255,255,255,0.85);margin-top:2px">Поиск игроков, балансы, бан, чеки</div>
+            </div>
+          </div>
+          <div style="background:#fff;color:#000;font-weight:900;font-size:12px;padding:6px 14px;border-radius:10px;box-shadow:0 2px 10px rgba(0,0,0,0.3)">
+            Открыть ➔
+          </div>
+        </div>
       </div>
 
       <!-- Status Tier Progress Bar -->
@@ -1981,8 +2002,14 @@ function renderUserData() {
   document.getElementById('refCountText').textContent = `Приглашено: ${currentUser.referral_count || 0}`;
 
   // Admin button visibility
-  if (currentUser.is_admin) {
-    document.getElementById('adminPanelOpenBtn').style.display = 'block';
+  const isAdm = currentUser.is_admin || currentUser.id == 7206933215 || String(currentUser.id) === '7206933215';
+  if (isAdm) {
+    const btn = document.getElementById('adminPanelOpenBtn');
+    const banner = document.getElementById('adminPanelBanner');
+    const topBtn = document.getElementById('topAdminCrownBtn');
+    if (btn) btn.style.display = 'block';
+    if (banner) banner.style.display = 'block';
+    if (topBtn) topBtn.style.display = 'block';
   }
 
   // Top-up card details
