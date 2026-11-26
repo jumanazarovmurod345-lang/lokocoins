@@ -1,5 +1,5 @@
 """SQLite database for LokoCoins Bot
-Balances, inventory, statuses, deposit requests, tap leaderboard, and settings.
+Balances, inventory, statuses, daily case, exchange, withdraw requests, admin tools and settings.
 """
 
 import sqlite3
@@ -35,6 +35,7 @@ def init():
                 referrer_id       INTEGER DEFAULT 0,
                 referral_count    INTEGER DEFAULT 0,
                 last_free         INTEGER DEFAULT 0,
+                is_banned         INTEGER DEFAULT 0,
                 rank_claims       TEXT    DEFAULT '{}',
                 inventory         TEXT    DEFAULT '[]',
                 promos            TEXT    DEFAULT '{}',
@@ -55,25 +56,28 @@ def init():
                 FOREIGN KEY (telegram_id) REFERENCES users(telegram_id)
             );
 
+            CREATE TABLE IF NOT EXISTS withdraw_requests (
+                id           INTEGER PRIMARY KEY AUTOINCREMENT,
+                telegram_id  INTEGER NOT NULL,
+                item_name    TEXT    NOT NULL,
+                item_icon    TEXT    DEFAULT '🎁',
+                stars_fee    INTEGER DEFAULT 25,
+                status       TEXT    DEFAULT 'pending', -- 'pending', 'sent', 'rejected'
+                created_at   REAL    DEFAULT (strftime('%s','now')),
+                processed_at REAL    DEFAULT NULL,
+                FOREIGN KEY (telegram_id) REFERENCES users(telegram_id)
+            );
+
             CREATE TABLE IF NOT EXISTS settings (
                 key   TEXT PRIMARY KEY,
                 value TEXT NOT NULL
-            );
-
-            CREATE TABLE IF NOT EXISTS payments (
-                id                  INTEGER PRIMARY KEY AUTOINCREMENT,
-                telegram_id         INTEGER NOT NULL,
-                amount              INTEGER NOT NULL,
-                charge_id           TEXT,
-                provider_charge_id  TEXT,
-                created_at          REAL DEFAULT (strftime('%s','now')),
-                FOREIGN KEY (telegram_id) REFERENCES users(telegram_id)
             );
         """)
 
         # Add missing columns if database was created previously
         existing_cols = [r["name"] for r in c.execute("PRAGMA table_info(users)").fetchall()]
         cols_to_add = [
+            ("is_banned", "INTEGER DEFAULT 0"),
             ("uzs_deposited", "INTEGER DEFAULT 0"),
             ("status", "TEXT DEFAULT 'Гость'"),
             ("claimed_statuses", "TEXT DEFAULT '[]'"),
@@ -81,6 +85,7 @@ def init():
             ("tap_best", "INTEGER DEFAULT 0"),
             ("referrer_id", "INTEGER DEFAULT 0"),
             ("referral_count", "INTEGER DEFAULT 0"),
+            ("last_free", "INTEGER DEFAULT 0"),
         ]
         for col_name, col_def in cols_to_add:
             if col_name not in existing_cols:
@@ -89,25 +94,12 @@ def init():
                 except Exception:
                     pass
 
-        dep_cols = [r["name"] for r in c.execute("PRAGMA table_info(deposit_requests)").fetchall()]
-        if "amount_uzs" not in dep_cols and "amount_rub" in dep_cols:
-            try:
-                c.execute("ALTER TABLE deposit_requests ADD COLUMN amount_uzs INTEGER DEFAULT 0")
-                c.execute("UPDATE deposit_requests SET amount_uzs = amount_rub * 2000 WHERE amount_uzs = 0")
-            except Exception:
-                pass
-        if "method" not in dep_cols:
-            try:
-                c.execute("ALTER TABLE deposit_requests ADD COLUMN method TEXT DEFAULT 'card'")
-            except Exception:
-                pass
-
-        # Official LokoCoins bank settings
+        # Updated bank settings: rate is now 1500 UZS = 1 Star
+        c.execute("INSERT OR REPLACE INTO settings (key, value) VALUES ('rate_uzs_to_star', '1500')")
         c.execute("INSERT OR IGNORE INTO settings (key, value) VALUES ('card_number', '5614 6812 5962 4009')")
         c.execute("INSERT OR IGNORE INTO settings (key, value) VALUES ('card_holder', 'Nafisa Xalimova')")
         c.execute("INSERT OR IGNORE INTO settings (key, value) VALUES ('card_bank', 'Uzcard / Humo')")
-        c.execute("INSERT OR IGNORE INTO settings (key, value) VALUES ('rate_uzs_to_star', '2000')")
-        c.execute("INSERT OR IGNORE INTO settings (key, value) VALUES ('min_uzs', '13000')")
+        c.execute("INSERT OR IGNORE INTO settings (key, value) VALUES ('min_uzs', '15000')")
         c.execute("INSERT OR IGNORE INTO settings (key, value) VALUES ('min_stars', '15')")
         c.execute("INSERT OR IGNORE INTO settings (key, value) VALUES ('admin_contact', 'merertd')")
 
@@ -165,7 +157,7 @@ def get_or_create(tid: int, first_name: str = "", username: str = "", referrer_i
 def get_all_users() -> list:
     with _conn() as c:
         rows = c.execute(
-            """SELECT telegram_id, first_name, username, coins, stars, deposited, uzs_deposited, status, created_at 
+            """SELECT telegram_id, first_name, username, coins, stars, deposited, uzs_deposited, status, is_banned, created_at 
                FROM users ORDER BY deposited DESC LIMIT 200"""
         ).fetchall()
     return [dict(r) for r in rows]
@@ -196,13 +188,14 @@ def add_inventory_item(tid: int, item: dict):
         return
     inv = user.get("inventory", [])
     item["won_at"] = int(time.time())
+    item["item_id"] = item.get("id") or f"it_{int(time.time())}_{len(inv)}"
+    item["withdrawn"] = False
     inv.insert(0, item)
     with _conn() as c:
         c.execute("UPDATE users SET inventory=? WHERE telegram_id=?", (json.dumps(inv), tid))
 
 
 def check_and_update_status(tid: int) -> dict:
-    """Updates user status based on deposited amount and awards status bonuses."""
     user = get_user(tid)
     if not user:
         return {}
@@ -210,12 +203,6 @@ def check_and_update_status(tid: int) -> dict:
     stars = user.get("deposited", 0)
     uzs = user.get("uzs_deposited", 0)
     claimed = set(user.get("claimed_statuses", []))
-
-    # Determine status level
-    # Гость — при первом входе.
-    # Местный — если пополнил от 50 звёзд или эквивалент, получает 500 LokoCoins.
-    # Крутой — если пополнил от 150 звёзд или 150000 сум, получает 25 звёзд на баланс.
-    # Элита — если пополнил от 500 звёзд или 250000 сум, получает 250 звёзд + 1000 LokoCoins.
 
     current_status = "Гость"
     coins_bonus = 0
@@ -225,12 +212,11 @@ def check_and_update_status(tid: int) -> dict:
         current_status = "Элита"
     elif stars >= 150 or uzs >= 150000:
         current_status = "Крутой"
-    elif stars >= 50 or uzs >= 100000:
+    elif stars >= 50 or uzs >= 75000:
         current_status = "Местный"
 
-    # Process bonuses sequentially for newly unlocked tiers
     unlocked_awards = []
-    if (stars >= 50 or uzs >= 100000) and "Местный" not in claimed:
+    if (stars >= 50 or uzs >= 75000) and "Местный" not in claimed:
         coins_bonus += 500
         claimed.add("Местный")
         unlocked_awards.append("Местный (+500 🪙)")
@@ -257,18 +243,78 @@ def check_and_update_status(tid: int) -> dict:
             (current_status, json.dumps(list(claimed)), stars_bonus, coins_bonus, tid)
         )
 
-    updated_user = get_user(tid)
     return {
         "status": current_status,
         "stars_bonus": stars_bonus,
         "coins_bonus": coins_bonus,
         "unlocked_awards": unlocked_awards,
-        "user": updated_user
+        "user": get_user(tid)
     }
 
 
+def exchange_coins_to_stars(tid: int, coins: int) -> tuple[bool, str, dict]:
+    """Exchange 500 LokoCoins = 5 Stars (100 coins = 1 star). Min: 500."""
+    if coins < 500:
+        return False, "Минимальная сумма обмена — 500 LokoCoins", {}
+    if coins % 100 != 0:
+        return False, "Сумма монет должна быть кратна 100", {}
+
+    user = get_user(tid)
+    if not user or user["coins"] < coins:
+        return False, "Недостаточно монет LokoCoins", {}
+
+    stars_to_add = coins // 100
+    with _conn() as c:
+        c.execute(
+            "UPDATE users SET coins = coins - ?, stars = stars + ? WHERE telegram_id=?",
+            (coins, stars_to_add, tid)
+        )
+
+    updated = get_user(tid)
+    return True, f"Успешный обмен: -{coins} 🪙 ➔ +{stars_to_add} ⭐", updated
+
+
+def request_gift_withdrawal(tid: int, item_name: str, item_icon: str = "🎁") -> tuple[bool, str, dict]:
+    """
+    Withdraw requirements:
+    1. At least 2 referrals (referral_count >= 2)
+    2. At least 25 stars for withdrawal commission
+    """
+    user = get_user(tid)
+    if not user:
+        return False, "Пользователь не найден", {}
+
+    if user.get("referral_count", 0) < 2:
+        return False, f"Для вывода подарка нужно пригласить минимум 2 друзей по вашей реферальной ссылке! (Сейчас приглашено: {user.get('referral_count', 0)})", {}
+
+    if user.get("stars", 0) < 25:
+        return False, f"Для вывода требуется 25 ⭐ комиссии на балансе. У вас: {user.get('stars', 0)} ⭐", {}
+
+    # Deduct 25 stars and mark item as withdrawn
+    inv = user.get("inventory", [])
+    found = False
+    for it in inv:
+        if it.get("name") == item_name and not it.get("withdrawn"):
+            it["withdrawn"] = True
+            it["withdraw_status"] = "pending"
+            found = True
+            break
+
+    if not found:
+        return False, "Предмет не найден в вашем инвентаре или уже отправлен на вывод", {}
+
+    with _conn() as c:
+        c.execute("UPDATE users SET stars = stars - 25, inventory = ? WHERE telegram_id=?", (json.dumps(inv), tid))
+        cur = c.execute(
+            "INSERT INTO withdraw_requests (telegram_id, item_name, item_icon, stars_fee, status) VALUES (?, ?, ?, 25, 'pending')",
+            (tid, item_name, item_icon)
+        )
+        req_id = cur.lastrowid
+
+    return True, f"Заявка на вывод #{req_id} создана! Списано 25 ⭐ комиссии. Администратор отправит подарок вам в Telegram.", {"request_id": req_id, "user": get_user(tid)}
+
+
 def submit_tap_score(tid: int, score: int) -> dict:
-    """Updates user's tap score and calculates current leaderboard."""
     score = int(score)
     with _conn() as c:
         c.execute(
@@ -308,7 +354,46 @@ def get_tap_leaderboard(limit: int = 15) -> dict:
     return {"leaders": leaders}
 
 
-# --- Deposit Requests (Card & Gift) ---
+# --- Admin Tools ---
+
+def admin_search_users(query: str) -> list:
+    query = str(query).strip().lstrip("@")
+    with _conn() as c:
+        if query.isdigit():
+            rows = c.execute(
+                "SELECT * FROM users WHERE telegram_id=? OR telegram_id LIKE ? LIMIT 20",
+                (int(query), f"%{query}%")
+            ).fetchall()
+        else:
+            rows = c.execute(
+                "SELECT * FROM users WHERE username LIKE ? OR first_name LIKE ? LIMIT 20",
+                (f"%{query}%", f"%{query}%")
+            ).fetchall()
+
+    res = []
+    for r in rows:
+        d = dict(r)
+        d["inventory"] = json.loads(d.get("inventory") or "[]")
+        res.append(d)
+    return res
+
+
+def admin_modify_balance(tid: int, stars_delta: int, coins_delta: int) -> dict | None:
+    with _conn() as c:
+        c.execute(
+            "UPDATE users SET stars = MAX(0, stars + ?), coins = MAX(0, coins + ?) WHERE telegram_id=?",
+            (stars_delta, coins_delta, tid)
+        )
+    return get_user(tid)
+
+
+def admin_toggle_ban(tid: int, ban_status: int) -> dict | None:
+    with _conn() as c:
+        c.execute("UPDATE users SET is_banned=? WHERE telegram_id=?", (ban_status, tid))
+    return get_user(tid)
+
+
+# --- Deposit Requests ---
 
 def create_deposit_request(tid: int, amount_uzs: int, stars: int, receipt_file: str = "", method: str = "card") -> int:
     with _conn() as c:
@@ -345,10 +430,20 @@ def get_all_deposit_requests(status_filter: str = None) -> list:
     return [dict(r) for r in rows]
 
 
-def process_deposit_request(req_id: int, action: str, admin_id: int) -> tuple[bool, str, dict]:
-    """Action: 'approve' or 'reject'. Returns (success, message, request_data)."""
+def get_all_withdraw_requests() -> list:
     with _conn() as c:
-        row = c.execute("SELECT * FROM deposit_requests WHERE id=?", (req_id,)).fetchone()
+        rows = c.execute(
+            """SELECT w.*, u.first_name, u.username 
+               FROM withdraw_requests w 
+               LEFT JOIN users u ON w.telegram_id = u.telegram_id 
+               ORDER BY w.id DESC LIMIT 50"""
+        ).fetchall()
+    return [dict(r) for r in rows]
+
+
+def process_deposit_request(req_id: int, action: str, admin_id: int) -> tuple[bool, str, dict]:
+    with _conn() as c:
+        row = c.execute("SELECT * FROM deposit_requests WHERE id=?", (req_id)).fetchone() if isinstance(req_id, tuple) else c.execute("SELECT * FROM deposit_requests WHERE id=?", (req_id,)).fetchone()
         if not row:
             return False, "Заявка не найдена", {}
         req = dict(row)
@@ -362,7 +457,6 @@ def process_deposit_request(req_id: int, action: str, admin_id: int) -> tuple[bo
             )
             stars = req["stars"]
             uzs = req.get("amount_uzs") or 0
-            # Начисляем звёзды и учитываем депозит
             c.execute(
                 """UPDATE users SET 
                    stars = stars + ?, 
@@ -372,10 +466,7 @@ def process_deposit_request(req_id: int, action: str, admin_id: int) -> tuple[bo
                 (stars, stars, uzs, req["telegram_id"])
             )
             req["status"] = "approved"
-
-            # Проверяем обновление статуса (Гость -> Местный -> Крутой -> Элита)
             check_and_update_status(req["telegram_id"])
-
             return True, f"Заявка #{req_id} одобрена, начислено {stars} ⭐", req
         elif action == "reject":
             c.execute(

@@ -1,6 +1,7 @@
-"""LokoCoins Bot - Complete Redesign
-Backend with Flask, WebApp API, Games (Upgrade, Rocket Crash, Tap Leaderboard), 
-Cases with NFT chances, Profile & Inventory, Statuses, and Card (UZS) / Star Gift Top-ups.
+"""LokoCoins Bot - Complete Redesign v2.1
+Backend with Flask, WebApp API, Games (Cards on Home, Upgrade, Rocket Crash, Tap, Wheel), 
+Cases (Daily Free Case, Beach, Gift, Rare, Elite - Zero NFT), Currency Exchange (500 coins = 5 stars),
+Gift Withdrawal with 2-referral & 25-star rule, Full Admin Panel, and 1500 UZS = 1 Star rate.
 """
 
 import os
@@ -29,7 +30,6 @@ from telegram import (
 from telegram.ext import (
     Application,
     CommandHandler,
-    CallbackQueryHandler,
     ContextTypes,
 )
 
@@ -66,8 +66,7 @@ def validate_init_data(raw: str) -> dict | None:
     if not raw:
         return None
     if not TOKEN or TOKEN == "ваш_токен_от_BotFather":
-        # Dev / browser testing demo user
-        return {"id": OWNER_ID or 7206933215, "first_name": "Игрок Loko", "username": "lokoplayer"}
+        return {"id": OWNER_ID, "first_name": "Merer", "username": "merertd"}
     try:
         parsed = dict(urllib.parse.parse_qsl(raw, keep_blank_values=True))
         recv_hash = parsed.pop("hash", "")
@@ -103,8 +102,7 @@ def get_current_user_from_req(req) -> dict | None:
     if user and user.get("id"):
         return user
 
-    # Fallback for browser direct testing
-    return {"id": OWNER_ID or 7206933215, "first_name": "Игрок", "username": "lokoplayer"}
+    return {"id": OWNER_ID, "first_name": "Merer", "username": "merertd"}
 
 
 def is_admin(user_id: int) -> bool:
@@ -135,7 +133,7 @@ def static_files(filename):
 
 @web.get("/health")
 def health():
-    return jsonify(status="ok", app="LokoCoins", version="2.0")
+    return jsonify(status="ok", app="LokoCoins", version="2.1")
 
 
 # ── API: User state & settings ──────────────────────────────────────────
@@ -146,7 +144,10 @@ def api_user():
         return jsonify(ok=False, error="auth_required"), 401
 
     data = db.get_or_create(user["id"], user.get("first_name", ""), user.get("username", ""))
-    # Auto-check status tier and award bonuses
+
+    if data.get("is_banned"):
+        return jsonify(ok=False, error="Ваш аккаунт заблокирован администратором."), 403
+
     status_info = db.check_and_update_status(user["id"])
     if status_info and status_info.get("user"):
         data = status_info["user"]
@@ -155,6 +156,10 @@ def api_user():
     is_adm = is_admin(user["id"])
     my_requests = db.get_user_deposit_requests(user["id"])
     tap_leaderboard = db.get_tap_leaderboard()
+
+    # Time until next daily free case
+    last_free = data.get("last_free", 0)
+    seconds_left = max(0, 86400 - int(time.time() - last_free))
 
     return jsonify(
         ok=True,
@@ -172,7 +177,8 @@ def api_user():
             "tap_best": data.get("tap_best", 0),
             "referrer_id": data.get("referrer_id", 0),
             "referral_count": data.get("referral_count", 0),
-            "last_free": data.get("last_free", 0),
+            "last_free": last_free,
+            "daily_seconds_left": seconds_left,
             "inventory": data.get("inventory", []),
             "promos": data.get("promos", []),
             "is_admin": is_adm,
@@ -182,8 +188,8 @@ def api_user():
             "card_number": settings.get("card_number", "5614 6812 5962 4009"),
             "card_holder": settings.get("card_holder", "Nafisa Xalimova"),
             "card_bank": settings.get("card_bank", "Uzcard / Humo"),
-            "rate_uzs_to_star": int(settings.get("rate_uzs_to_star", "2000")),
-            "min_uzs": int(settings.get("min_uzs", "13000")),
+            "rate_uzs_to_star": int(settings.get("rate_uzs_to_star", "1500")),
+            "min_uzs": int(settings.get("min_uzs", "15000")),
             "min_stars": int(settings.get("min_stars", "15")),
             "admin_contact": settings.get("admin_contact", "merertd"),
         },
@@ -192,16 +198,21 @@ def api_user():
     )
 
 
-# ── API: Game 1 - Upgrade (Колесо Апгрейда) ──────────────────────────────
+# ── API: Wheel / Upgrade (Колесо фортуны) ──────────────────────────────
+@web.post("/api/wheel/spin")
 @web.post("/api/upgrade/play")
-def api_upgrade_play():
+def api_wheel_spin():
     user = get_current_user_from_req(freq)
     if not user:
         return jsonify(ok=False, error="auth_required"), 401
 
+    u = db.get_user(user["id"])
+    if u.get("is_banned"):
+        return jsonify(ok=False, error="Аккаунт заблокирован"), 403
+
     body = freq.get_json(silent=True) or {}
     bet = int(body.get("bet", 0))
-    currency = body.get("currency", "stars") # "stars" or "coins"
+    currency = body.get("currency", "stars")
     multiplier = float(body.get("multiplier", 2.0))
 
     if bet <= 0:
@@ -209,24 +220,20 @@ def api_upgrade_play():
     if multiplier not in [1.5, 2.0, 3.0, 5.0, 10.0, 20.0]:
         return jsonify(ok=False, error="Некорректный множитель"), 400
 
-    u = db.get_user(user["id"])
     bal = u["stars"] if currency == "stars" else u["coins"]
     if bal < bet:
         return jsonify(ok=False, error="Недостаточно средств на балансе"), 400
 
-    # Win rate formula: standard exciting casino upgrade RTP ~ 90%
+    # Win rate formula: fair casino RTP ~ 90%
     win_chance = 0.90 / multiplier
     is_win = random.random() < win_chance
 
-    # Violet win zone takes `sector_size = (win_chance * 360)` degrees, centered from 0 to sector_size
     sector_size = win_chance * 360.0
     if is_win:
-        # Stop inside the violet winning zone [2, sector_size - 2]
-        angle = random.uniform(2.0, max(2.1, sector_size - 2.0))
+        angle = random.uniform(3.0, max(3.1, sector_size - 3.0))
         win_amount = int(bet * multiplier)
     else:
-        # Stop inside the losing zone [sector_size + 2, 358.0]
-        angle = random.uniform(min(357.9, sector_size + 2.0), 358.0)
+        angle = random.uniform(min(356.9, sector_size + 3.0), 357.0)
         win_amount = 0
 
     delta = win_amount - bet
@@ -257,29 +264,30 @@ def api_rocket_play():
     if not user:
         return jsonify(ok=False, error="auth_required"), 401
 
+    u = db.get_user(user["id"])
+    if u.get("is_banned"):
+        return jsonify(ok=False, error="Аккаунт заблокирован"), 403
+
     body = freq.get_json(silent=True) or {}
     bet = int(body.get("bet", 0))
     currency = body.get("currency", "stars")
-    cashout_at = float(body.get("cashout_at", 0)) # 0 if manual or auto
+    cashout_at = float(body.get("cashout_at", 0))
 
     if bet <= 0:
         return jsonify(ok=False, error="Укажите ставку"), 400
 
-    u = db.get_user(user["id"])
     bal = u["stars"] if currency == "stars" else u["coins"]
     if bal < bet:
         return jsonify(ok=False, error="Недостаточно средств"), 400
 
-    # Crash point generator (standard provably fair curve, 95% RTP)
     r = random.random()
     if r < 0.04:
-        crash_point = 1.00 # Instant bust
+        crash_point = 1.00
     else:
         crash_point = round(max(1.01, 0.96 / (1.0 - r)), 2)
         if crash_point > 100.0:
             crash_point = round(random.uniform(50.0, 100.0), 2)
 
-    # Check if user cashed out
     won = False
     win_amount = 0
     if 1.0 < cashout_at <= crash_point:
@@ -328,16 +336,79 @@ def api_tap_submit():
     )
 
 
-# ── API: Cases (4 Кейса с NFT шансами) ──────────────────────────────────
+# ── API: Currency Exchange (500 LokoCoins = 5 Stars) ───────────────────
+@web.post("/api/exchange")
+def api_exchange():
+    user = get_current_user_from_req(freq)
+    if not user:
+        return jsonify(ok=False, error="auth_required"), 401
+
+    body = freq.get_json(silent=True) or {}
+    coins = int(body.get("coins", 500))
+
+    success, msg, updated = db.exchange_coins_to_stars(user["id"], coins)
+    if not success:
+        return jsonify(ok=False, error=msg), 400
+
+    return jsonify(
+        ok=True,
+        message=msg,
+        stars=updated["stars"],
+        coins=updated["coins"]
+    )
+
+
+# ── API: Gift Withdrawal (Инвентарь: 2 реферала + 25 звёзд) ─────────────
+@web.post("/api/gift/withdraw")
+def api_gift_withdraw():
+    user = get_current_user_from_req(freq)
+    if not user:
+        return jsonify(ok=False, error="auth_required"), 401
+
+    body = freq.get_json(silent=True) or {}
+    item_name = str(body.get("item_name", "")).strip()
+    item_icon = str(body.get("item_icon", "🎁")).strip()
+
+    if not item_name:
+        return jsonify(ok=False, error="Не указан предмет"), 400
+
+    success, msg, data = db.request_gift_withdrawal(user["id"], item_name, item_icon)
+    if not success:
+        return jsonify(ok=False, error=msg), 400
+
+    # Notify Admin about gift withdrawal request
+    notify_admin_withdraw_request(user, item_name, item_icon, data.get("request_id", 0))
+
+    return jsonify(
+        ok=True,
+        message=msg,
+        user=data.get("user")
+    )
+
+
+# ── API: Cases (Zero NFT! Includes Daily Free Case) ──────────────────────
 CASE_CONFIG = {
+    "daily": {
+        "name": "Бесплатный кейс",
+        "price": 0,
+        "desc": "Открывайте раз в 24 часа! Выпадают LokoCoins и редкий Пляжный Мишка 🧸",
+        "is_daily": True,
+        "items": [
+            {"id": "daily_coins_small", "name": "Мешочек 150 LokoCoins", "icon": "🪙", "rarity": "Обычный", "stars_val": 2, "weight": 55},
+            {"id": "daily_coins_med", "name": "Куш 300 LokoCoins", "icon": "💰", "rarity": "Обычный", "stars_val": 3, "weight": 35},
+            {"id": "bear_beach", "name": "Пляжный Мишка", "icon": "🧸", "rarity": "Редкий", "stars_val": 15, "weight": 10},
+        ],
+        "coins_min": 100,
+        "coins_max": 300,
+    },
     "beach": {
         "name": "Пляжный кейс",
         "price": 15,
         "desc": "Почти всегда падает редкий Пляжный Мишка + LokoCoins",
         "items": [
-            {"id": "bear_beach", "name": "Пляжный Мишка", "icon": "🧸", "rarity": "Редкий", "is_nft": False, "stars_val": 15, "weight": 85},
-            {"id": "bear_golden", "name": "Золотой Мишка", "icon": "👑🧸", "rarity": "Эпический", "is_nft": False, "stars_val": 30, "weight": 12},
-            {"id": "bear_cyber", "name": "Кибер-Мишка", "icon": "🤖🧸", "rarity": "Легендарный", "is_nft": False, "stars_val": 75, "weight": 3},
+            {"id": "bear_beach", "name": "Пляжный Мишка", "icon": "🧸", "rarity": "Редкий", "stars_val": 15, "weight": 85},
+            {"id": "bear_golden", "name": "Золотой Мишка", "icon": "👑🧸", "rarity": "Эпический", "stars_val": 30, "weight": 12},
+            {"id": "bear_cyber", "name": "Кибер-Мишка", "icon": "🤖🧸", "rarity": "Легендарный", "stars_val": 75, "weight": 3},
         ],
         "coins_min": 150,
         "coins_max": 500,
@@ -347,10 +418,10 @@ CASE_CONFIG = {
         "price": 20,
         "desc": "Официальные Telegram-подарки от 15 звёзд + LokoCoins",
         "items": [
-            {"id": "gift_cake", "name": "Праздничный Торт", "icon": "🎂", "rarity": "Обычный", "is_nft": False, "stars_val": 15, "weight": 55},
-            {"id": "gift_box", "name": "Подарочный Бокс", "icon": "🎁", "rarity": "Редкий", "is_nft": False, "stars_val": 25, "weight": 30},
-            {"id": "gift_heart", "name": "Звёздное Сердце", "icon": "💖", "rarity": "Эпический", "is_nft": False, "stars_val": 50, "weight": 12},
-            {"id": "gift_crown", "name": "Императорская Корона", "icon": "👑", "rarity": "Легендарный", "is_nft": False, "stars_val": 100, "weight": 3},
+            {"id": "gift_cake", "name": "Праздничный Торт", "icon": "🎂", "rarity": "Обычный", "stars_val": 15, "weight": 55},
+            {"id": "gift_box", "name": "Подарочный Бокс", "icon": "🎁", "rarity": "Редкий", "stars_val": 25, "weight": 30},
+            {"id": "gift_heart", "name": "Звёздное Сердце", "icon": "💖", "rarity": "Эпический", "stars_val": 50, "weight": 12},
+            {"id": "gift_crown", "name": "Императорская Корона", "icon": "👑", "rarity": "Легендарный", "stars_val": 100, "weight": 3},
         ],
         "coins_min": 300,
         "coins_max": 800,
@@ -358,13 +429,11 @@ CASE_CONFIG = {
     "rare": {
         "name": "Редкий кейс",
         "price": 25,
-        "desc": "Telegram-подарки + шанс 0.5% на эксклюзивный NFT-подарок!",
-        "nft_chance": 0.005, # 0.5% шанс на NFT
-        "nft_item": {"id": "nft_rare_voucher", "name": "Telegram NFT Gift #777", "icon": "💎⚡", "rarity": "NFT", "is_nft": True, "stars_val": 250},
+        "desc": "Эксклюзивные Telegram-подарки и солидный куш звёзд",
         "items": [
-            {"id": "rare_gem", "name": "Сияющий Рубин", "icon": "💎", "rarity": "Редкий", "is_nft": False, "stars_val": 25, "weight": 55},
-            {"id": "rare_rocket", "name": "Золотая Ракета", "icon": "🚀", "rarity": "Эпический", "is_nft": False, "stars_val": 45, "weight": 35},
-            {"id": "rare_phoenix", "name": "Огненный Феникс", "icon": "🔥🦅", "rarity": "Легендарный", "is_nft": False, "stars_val": 80, "weight": 10},
+            {"id": "rare_gem", "name": "Сияющий Рубин", "icon": "💎", "rarity": "Редкий", "stars_val": 25, "weight": 55},
+            {"id": "rare_rocket", "name": "Золотая Ракета", "icon": "🚀", "rarity": "Эпический", "stars_val": 45, "weight": 35},
+            {"id": "rare_phoenix", "name": "Огненный Феникс", "icon": "🔥🦅", "rarity": "Легендарный", "stars_val": 80, "weight": 10},
         ],
         "coins_min": 500,
         "coins_max": 1200,
@@ -372,13 +441,11 @@ CASE_CONFIG = {
     "elite": {
         "name": "Элитный кейс",
         "price": 50,
-        "desc": "Премиальные Telegram-подарки + шанс 1.0% на редчайший NFT!",
-        "nft_chance": 0.010, # 1% шанс на NFT
-        "nft_item": {"id": "nft_elite_trophy", "name": "Loko Masterpiece NFT #001", "icon": "🏆✨", "rarity": "NFT", "is_nft": True, "stars_val": 500},
+        "desc": "Премиальные Telegram-подарки высшего достоинства",
         "items": [
-            {"id": "elite_trophy", "name": "Кубок Победителя", "icon": "🏆", "rarity": "Эпический", "is_nft": False, "stars_val": 50, "weight": 50},
-            {"id": "elite_car", "name": "Спорткар Киберпанк", "icon": "🏎️", "rarity": "Легендарный", "is_nft": False, "stars_val": 120, "weight": 40},
-            {"id": "elite_star", "name": "Сверхновая Звезда", "icon": "🌟", "rarity": "Мифический", "is_nft": False, "stars_val": 250, "weight": 10},
+            {"id": "elite_trophy", "name": "Кубок Победителя", "icon": "🏆", "rarity": "Эпический", "stars_val": 50, "weight": 50},
+            {"id": "elite_car", "name": "Спорткар Киберпанк", "icon": "🏎️", "rarity": "Легендарный", "stars_val": 120, "weight": 40},
+            {"id": "elite_star", "name": "Сверхновая Звезда", "icon": "🌟", "rarity": "Мифический", "stars_val": 250, "weight": 10},
         ],
         "coins_min": 1000,
         "coins_max": 3000,
@@ -392,42 +459,47 @@ def api_case_open():
     if not user:
         return jsonify(ok=False, error="auth_required"), 401
 
+    u = db.get_user(user["id"])
+    if u.get("is_banned"):
+        return jsonify(ok=False, error="Аккаунт заблокирован"), 403
+
     body = freq.get_json(silent=True) or {}
     case_id = body.get("case_id", "")
     if case_id not in CASE_CONFIG:
         return jsonify(ok=False, error="Кейс не найден"), 404
 
     cfg = CASE_CONFIG[case_id]
-    u = db.get_user(user["id"])
 
-    if u["stars"] < cfg["price"]:
-        return jsonify(ok=False, error=f"Недостаточно звёзд. Цена: {cfg['price']} ⭐"), 400
-
-    # Check NFT roll if applicable
-    won_item = None
-    nft_roll = random.random()
-    if cfg.get("nft_chance") and nft_roll < cfg["nft_chance"]:
-        won_item = dict(cfg["nft_item"])
+    # Daily Case 24h Check
+    if cfg.get("is_daily"):
+        last_free = u.get("last_free", 0)
+        time_passed = int(time.time() - last_free)
+        if time_passed < 86400:
+            rem = 86400 - time_passed
+            hours = rem // 3600
+            mins = (rem % 3600) // 60
+            return jsonify(ok=False, error=f"Бесплатный кейс доступен раз в 24 часа. Ждите: {hours}ч {mins}мин."), 400
+        u["last_free"] = int(time.time())
     else:
-        # Weighted item choice
-        items = cfg["items"]
-        weights = [it.get("weight", 1) for it in items]
-        chosen = random.choices(items, weights=weights, k=1)[0]
-        won_item = dict(chosen)
+        if u["stars"] < cfg["price"]:
+            return jsonify(ok=False, error=f"Недостаточно звёзд. Цена: {cfg['price']} ⭐"), 400
+        u["stars"] -= cfg["price"]
+
+    # Weighted item choice (Zero NFT)
+    items = cfg["items"]
+    weights = [it.get("weight", 1) for it in items]
+    chosen = random.choices(items, weights=weights, k=1)[0]
+    won_item = dict(chosen)
 
     bonus_coins = random.randint(cfg.get("coins_min", 100), cfg.get("coins_max", 500))
-
-    # Deduct stars, add bonus coins, save item to user's inventory
-    u["stars"] -= cfg["price"]
     u["coins"] += bonus_coins
+
     db.save_state(user["id"], u)
     db.add_inventory_item(user["id"], won_item)
 
-    # Build roulette reel items for animation
+    # Build roulette reel items
     reel = []
     pool = list(cfg["items"])
-    if cfg.get("nft_item"):
-        pool.append(cfg["nft_item"])
     for _ in range(40):
         reel.append(random.choice(pool))
     reel.append(won_item)
@@ -461,7 +533,7 @@ def api_promo_apply():
         return jsonify(ok=False, error="auth_required"), 401
 
     body = freq.get_json(silent=True) or {}
-    code = str(body.get("code", "")).strip().toUpperCase() if hasattr(str, 'toUpperCase') else str(body.get("code", "")).strip().upper()
+    code = str(body.get("code", "")).strip().upper()
     if not code:
         return jsonify(ok=False, error="Введите промокод"), 400
 
@@ -498,10 +570,9 @@ def api_deposit_create():
     if not user:
         return jsonify(ok=False, error="auth_required"), 401
 
-    method = freq.form.get("method", "card") # 'card' or 'gift'
+    method = freq.form.get("method", "card")
 
     if method == "gift":
-        # Telegram gift method
         try:
             stars = int(freq.form.get("stars", 15))
         except ValueError:
@@ -527,20 +598,20 @@ def api_deposit_create():
             message="Заявка создана! Отправьте подарок администратору в Telegram.",
         )
 
-    # Card payment in UZS
+    # Card payment in UZS: Rate is 1500 UZS = 1 Star!
     try:
         amount_uzs = int(freq.form.get("amount_uzs", 0))
     except ValueError:
         return jsonify(ok=False, error="Некорректная сумма в сумах"), 400
 
-    if amount_uzs < 13000:
-        return jsonify(ok=False, error="Минимальное пополнение — 13 000 сум (или от 15 звёзд)"), 400
-    if amount_uzs > 50000000:
-        return jsonify(ok=False, error="Превышен лимит пополнения"), 400
-
-    rate = int(db.get_setting("rate_uzs_to_star", "2000"))
+    rate = int(db.get_setting("rate_uzs_to_star", "1500"))
     if rate <= 0:
-        rate = 2000
+        rate = 1500
+
+    min_uzs = int(db.get_setting("min_uzs", "15000"))
+    if amount_uzs < min_uzs:
+        return jsonify(ok=False, error=f"Минимальное пополнение — {min_uzs:,} сум (или от 15 звёзд)"), 400
+
     stars_to_credit = int(amount_uzs / rate)
 
     file = freq.files.get("receipt")
@@ -575,74 +646,51 @@ def api_deposit_create():
     )
 
 
-# ── Notification Helpers ────────────────────────────────────────────────
-def notify_admin_new_deposit(req_id: int, user: dict, amount_uzs: int, stars: int, receipt_file: str, method: str = "card"):
-    if not OWNER_ID or not bot_app:
-        return
-
-    async def _send():
-        try:
-            uname = f"@{user.get('username')}" if user.get('username') else user.get('first_name', '')
-            if method == "gift":
-                text = (
-                    f"🎁 <b>Заявка на пополнение звёздами (TG-Подарок) #{req_id}</b>\n\n"
-                    f"👤 Игрок: {uname} (ID: <code>{user['id']}</code>)\n"
-                    f"⭐ Ожидаемый подарок: <b>{stars} звёзд</b>\n\n"
-                    f"Проверьте входящий подарок в вашем Telegram и начислите баланс в админ-панели!"
-                )
-            else:
-                text = (
-                    f"🔔 <b>Новая заявка на пополнение картой #{req_id}</b>\n\n"
-                    f"👤 Игрок: {uname} (ID: <code>{user['id']}</code>)\n"
-                    f"💳 Сумма: <b>{amount_uzs:,} сум</b>\n"
-                    f"⭐ К зачислению: <b>{stars} звёзд</b>\n"
-                    f"🧾 Чек прикреплён.\n\n"
-                    f"Откройте админ-панель для проверки чека и зачисления."
-                )
-            await bot_app.bot.send_message(
-                chat_id=OWNER_ID,
-                text=text,
-                parse_mode="HTML"
-            )
-        except Exception as e:
-            logging.error("Failed to notify admin: %s", e)
-
-    if bot_loop:
-        asyncio.run_coroutine_threadsafe(_send(), bot_loop)
-
-
-def notify_user_deposit_result(user_id: int, req_id: int, status: str, stars: int):
-    if not bot_app:
-        return
-
-    async def _send():
-        try:
-            if status == "approved":
-                text = (
-                    f"✅ <b>Пополнение успешно подтверждено!</b>\n\n"
-                    f"Заявка #{req_id} одобрена администратором.\n"
-                    f"Вам начислено: <b>+{stars} ⭐</b>!\n\n"
-                    f"Звёзды уже на вашем балансе в приложении."
-                )
-            else:
-                text = (
-                    f"❌ <b>Заявка на пополнение #{req_id} отклонена.</b>\n\n"
-                    f"Платёж не был найден или чек не подтверждён. "
-                    f"Если произошла ошибка, напишите администратору @merertd."
-                )
-            await bot_app.bot.send_message(
-                chat_id=user_id,
-                text=text,
-                parse_mode="HTML"
-            )
-        except Exception as e:
-            logging.error("Failed to notify user %d: %s", user_id, e)
-
-    if bot_loop:
-        asyncio.run_coroutine_threadsafe(_send(), bot_loop)
-
-
 # ── Admin Panel API Endpoints ───────────────────────────────────────────
+@web.post("/api/admin/users/search")
+def api_admin_search():
+    user = get_current_user_from_req(freq)
+    if not user or not is_admin(user["id"]):
+        return jsonify(ok=False, error="forbidden"), 403
+
+    body = freq.get_json(silent=True) or {}
+    q = body.get("query", "")
+    results = db.admin_search_users(q)
+    return jsonify(ok=True, users=results)
+
+
+@web.post("/api/admin/users/modify")
+def api_admin_modify():
+    user = get_current_user_from_req(freq)
+    if not user or not is_admin(user["id"]):
+        return jsonify(ok=False, error="forbidden"), 403
+
+    body = freq.get_json(silent=True) or {}
+    target_id = int(body.get("target_id", 0))
+    stars_delta = int(body.get("stars_delta", 0))
+    coins_delta = int(body.get("coins_delta", 0))
+
+    updated = db.admin_modify_balance(target_id, stars_delta, coins_delta)
+    if not updated:
+        return jsonify(ok=False, error="Игрок не найден"), 404
+
+    return jsonify(ok=True, user=updated)
+
+
+@web.post("/api/admin/users/ban")
+def api_admin_ban():
+    user = get_current_user_from_req(freq)
+    if not user or not is_admin(user["id"]):
+        return jsonify(ok=False, error="forbidden"), 403
+
+    body = freq.get_json(silent=True) or {}
+    target_id = int(body.get("target_id", 0))
+    is_banned = int(body.get("is_banned", 1))
+
+    updated = db.admin_toggle_ban(target_id, is_banned)
+    return jsonify(ok=True, user=updated)
+
+
 @web.post("/api/admin/requests")
 def api_admin_requests():
     user = get_current_user_from_req(freq)
@@ -651,12 +699,14 @@ def api_admin_requests():
 
     status_filter = freq.json.get("status") if freq.is_json else None
     reqs = db.get_all_deposit_requests(status_filter)
+    withdraws = db.get_all_withdraw_requests()
     users = db.get_all_users()
     settings = db.get_all_settings()
 
     return jsonify(
         ok=True,
         requests=reqs,
+        withdraws=withdraws,
         users_count=len(users),
         users=users[:50],
         settings=settings,
@@ -701,6 +751,88 @@ def api_admin_settings():
     return jsonify(ok=True, settings=db.get_all_settings())
 
 
+# ── Notification Helpers ────────────────────────────────────────────────
+def notify_admin_withdraw_request(user: dict, item_name: str, item_icon: str, req_id: int):
+    if not OWNER_ID or not bot_app:
+        return
+
+    async def _send():
+        try:
+            uname = f"@{user.get('username')}" if user.get('username') else user.get('first_name', '')
+            text = (
+                f"🎁 <b>Заявка на вывод подарка #{req_id}</b>\n\n"
+                f"👤 Игрок: {uname} (ID: <code>{user['id']}</code>)\n"
+                f"📦 Предмет: <b>{item_icon} {item_name}</b>\n"
+                f"⭐️ Комиссия 25 звёзд списана с баланса.\n"
+                f"👥 Приглашено друзей: {user.get('referral_count', 0)}\n\n"
+                f"Отправьте подарок игроку в Telegram!"
+            )
+            await bot_app.bot.send_message(chat_id=OWNER_ID, text=text, parse_mode="HTML")
+        except Exception as e:
+            logging.error("Failed to notify admin withdraw: %s", e)
+
+    if bot_loop:
+        asyncio.run_coroutine_threadsafe(_send(), bot_loop)
+
+
+def notify_admin_new_deposit(req_id: int, user: dict, amount_uzs: int, stars: int, receipt_file: str, method: str = "card"):
+    if not OWNER_ID or not bot_app:
+        return
+
+    async def _send():
+        try:
+            uname = f"@{user.get('username')}" if user.get('username') else user.get('first_name', '')
+            if method == "gift":
+                text = (
+                    f"🎁 <b>Заявка на пополнение звёздами (TG-Подарок) #{req_id}</b>\n\n"
+                    f"👤 Игрок: {uname} (ID: <code>{user['id']}</code>)\n"
+                    f"⭐ Ожидаемый подарок: <b>{stars} звёзд</b>\n\n"
+                    f"Проверьте подарок в личном Telegram и начислите баланс в админ-панели!"
+                )
+            else:
+                text = (
+                    f"🔔 <b>Новая заявка на пополнение картой #{req_id}</b>\n\n"
+                    f"👤 Игрок: {uname} (ID: <code>{user['id']}</code>)\n"
+                    f"💳 Сумма: <b>{amount_uzs:,} сум</b>\n"
+                    f"⭐ К зачислению: <b>{stars} звёзд</b> (курс: 1500 сум)\n"
+                    f"🧾 Чек прикреплён.\n\n"
+                    f"Проверьте чек и подтвердите заявку."
+                )
+            await bot_app.bot.send_message(chat_id=OWNER_ID, text=text, parse_mode="HTML")
+        except Exception as e:
+            logging.error("Failed to notify admin: %s", e)
+
+    if bot_loop:
+        asyncio.run_coroutine_threadsafe(_send(), bot_loop)
+
+
+def notify_user_deposit_result(user_id: int, req_id: int, status: str, stars: int):
+    if not bot_app:
+        return
+
+    async def _send():
+        try:
+            if status == "approved":
+                text = (
+                    f"✅ <b>Пополнение успешно подтверждено!</b>\n\n"
+                    f"Заявка #{req_id} одобрена администратором.\n"
+                    f"Вам начислено: <b>+{stars} ⭐</b>!\n\n"
+                    f"Звёзды уже на вашем балансе в приложении."
+                )
+            else:
+                text = (
+                    f"❌ <b>Заявка на пополнение #{req_id} отклонена.</b>\n\n"
+                    f"Платёж не был найден или чек не подтверждён. "
+                    f"Если произошла ошибка, напишите администратору @merertd."
+                )
+            await bot_app.bot.send_message(chat_id=user_id, text=text, parse_mode="HTML")
+        except Exception as e:
+            logging.error("Failed to notify user %d: %s", user_id, e)
+
+    if bot_loop:
+        asyncio.run_coroutine_threadsafe(_send(), bot_loop)
+
+
 # ── Web Server Runner ───────────────────────────────────────────────────
 def run_web():
     logging.info("Starting Web Server on port %d...", PORT)
@@ -727,7 +859,6 @@ async def cmd_start(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     if not msg:
         return
 
-    # Check referral code from /start ref_12345
     ref_id = 0
     if ctx.args and ctx.args[0].startswith("ref_"):
         try:
@@ -752,10 +883,11 @@ async def cmd_start(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     welcome_text = (
         f"Привет, {user.first_name}! 🚀\n\n"
         f"Добро пожаловать в <b>LokoCoins</b> — премиальный игровой портал!\n\n"
-        f"🎮 <b>Игры:</b> Апгрейд (с колесом), Ракета (Crash), Тапалка с призами\n"
-        f"📦 <b>Кейсы:</b> Пляжный, Подарочный, Редкий и Элитный с NFT!\n"
-        f"💳 <b>Пополнение:</b> Карта Uzcard/Humo (2000 сум = 1 ⭐) или Telegram-подарки\n"
-        f"👤 <b>Профиль:</b> Инвентарь, Статусы (Гость, Местный, Крутой, Элита) и рефералы\n\n"
+        f"🎮 <b>Игры:</b> Апгрейд, Ракета (Crash), Тапалка с призами и Колесо рулетки\n"
+        f"📦 <b>Кейсы:</b> Бесплатный ежедневный кейс (раз в 24ч) + Пляжный, Подарочный, Редкий и Элитный\n"
+        f"💱 <b>Обмен валют:</b> 500 LokoCoins = 5 Звёзд\n"
+        f"🎁 <b>Вывод подарков:</b> доступен от 2 приглашенных друзей\n"
+        f"💳 <b>Пополнение:</b> Карта Uzcard/Humo (курс: 1500 сум = 1 ⭐) или Telegram-подарки\n\n"
         f"Нажми кнопку ниже, чтобы начать игру!"
     )
 
